@@ -21,6 +21,45 @@ class User {
 	}
 
 	/**
+	 * IS CONNECTED STATE
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function isConnected() {
+
+		# Crash
+		if(!$this->_oSession->isActive()) { throw new Exception("Can't get user connected state, no session active."); }
+
+		# No datas
+		if(empty($_SESSION['user']['connected'])) { return false; }
+
+		# Retrieve
+		return (bool) $_SESSION['user']['connected'];
+
+	}
+
+	/**
+	 * SET CONNECTED STATE
+	 *
+	 * @param bool $bState
+	 * @return $this
+	 * @throws Exception
+	 */
+	public function setConnectedState($bState) {
+
+		# Crash
+		if(!$this->_oSession->isActive()) { throw new Exception("Can't set user connected state, no session active."); }
+
+		# Set
+		$_SESSION['user']['connected'] = (bool) $bState;
+
+		# Maintain chainability
+		return $this;
+
+	}
+
+	/**
 	 * GET USER ID
 	 *
 	 * @return int
@@ -110,7 +149,7 @@ class User {
 		if(!$this->_oSession->isActive()) { throw new Exception("Can't delete user, no session active."); }
 
 		# Delete
-		unset($_SESSION['user']['login'], $_SESSION['user']['id']);
+		unset($_SESSION['user']['login'], $_SESSION['user']['id'], $_SESSION['user']['connected']);
 
 		# Maintain chainability
 		return $this;
