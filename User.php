@@ -21,12 +21,51 @@ class User {
 	}
 
 	/**
+	 * GET USER ID
+	 *
+	 * @return int
+	 * @throws Exception
+	 */
+	public function getId() {
+
+		# Crash
+		if(!$this->_oSession->isActive()) { throw new Exception("Can't get user id, no session active."); }
+
+		# No datas
+		if(empty($_SESSION['user']['id'])) { return 0; }
+
+		# Retrieve
+		return (int) filter_var($_SESSION['user']['id'], FILTER_VALIDATE_INT);
+
+	}
+
+	/**
+	 * SET USER ID
+	 *
+	 * @param int $iId
+	 * @return $this
+	 * @throws Exception
+	 */
+	public function setId($iId) {
+
+		# Crash
+		if(!$this->_oSession->isActive()) { throw new Exception("Can't set user id, no session active."); }
+
+		# Set
+		$_SESSION['user']['id'] = filter_var($iId, FILTER_VALIDATE_INT) ?: 0;
+
+		# Maintain chainability
+		return $this;
+
+	}
+
+	/**
 	 * GET USER LOGIN
 	 *
 	 * @return string
 	 * @throws Exception
 	 */
-	public function get() {
+	public function getLogin() {
 
 		# Crash
 		if(!$this->_oSession->isActive()) { throw new Exception("Can't get user login, no session active."); }
@@ -46,7 +85,7 @@ class User {
 	 * @return $this
 	 * @throws Exception
 	 */
-	public function set($sEmail) {
+	public function setLogin($sEmail) {
 
 		# Crash
 		if(!$this->_oSession->isActive()) { throw new Exception("Can't set user login, no session active."); }
@@ -60,7 +99,7 @@ class User {
 	}
 
 	/**
-	 * DELETE USER LOGIN
+	 * DELETE USER
 	 *
 	 * @return $this
 	 * @throws Exception
@@ -68,10 +107,10 @@ class User {
 	public function delete() {
 
 		# Crash
-		if(!$this->_oSession->isActive()) { throw new Exception("Can't delete user login, no session active."); }
+		if(!$this->_oSession->isActive()) { throw new Exception("Can't delete user, no session active."); }
 
 		# Delete
-		unset($_SESSION['user']['login']);
+		unset($_SESSION['user']['login'], $_SESSION['user']['id']);
 
 		# Maintain chainability
 		return $this;
