@@ -83,9 +83,6 @@ class Session {
 		# User
 		$this->_oUser = new User($this);
 
-		# Connection disable [STOP]
-		if(!$oConfig->getConnectionState()) { return; }
-
 	}
 
 	/**
