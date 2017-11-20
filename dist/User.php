@@ -8,8 +8,16 @@ use Exception;
  */
 class User {
 
+	const
+		CONNECTED_PATH = 'connected',
+		LOGIN_PATH = 'login',
+		ID_PATH = 'id';
+
 	/** @var Session */
 	private $_oSession = null;
+
+	/** @var string Session user path */
+	private $_sPath = '';
 
 	/**
 	 * User constructor.
@@ -18,6 +26,7 @@ class User {
 	 */
 	public function __construct(Session $oSession) {
 		$this->_oSession = $oSession;
+		$this->_sPath = $oSession->Config()->getUserSessionPath();
 	}
 
 	/**
@@ -32,10 +41,10 @@ class User {
 		if(!$this->_oSession->isActive()) { throw new Exception("Can't get user connected state, no session active."); }
 
 		# No datas
-		if(empty($_SESSION['user']['connected'])) { return false; }
+		if(empty($_SESSION[$this->_sPath][self::CONNECTED_PATH])) { return false; }
 
 		# Retrieve
-		return (bool) $_SESSION['user']['connected'];
+		return (bool) $_SESSION[$this->_sPath][self::CONNECTED_PATH];
 
 	}
 
@@ -52,7 +61,7 @@ class User {
 		if(!$this->_oSession->isActive()) { throw new Exception("Can't set user connected state, no session active."); }
 
 		# Set
-		$_SESSION['user']['connected'] = (bool) $bState;
+		$_SESSION[$this->_sPath][self::CONNECTED_PATH] = (bool) $bState;
 
 		# Maintain chainability
 		return $this;
@@ -71,10 +80,10 @@ class User {
 		if(!$this->_oSession->isActive()) { throw new Exception("Can't get user id, no session active."); }
 
 		# No datas
-		if(empty($_SESSION['user']['id'])) { return 0; }
+		if(empty($_SESSION[$this->_sPath][self::ID_PATH])) { return 0; }
 
 		# Retrieve
-		return (int) filter_var($_SESSION['user']['id'], FILTER_VALIDATE_INT);
+		return (int) filter_var($_SESSION[$this->_sPath][self::ID_PATH], FILTER_VALIDATE_INT);
 
 	}
 
@@ -91,7 +100,7 @@ class User {
 		if(!$this->_oSession->isActive()) { throw new Exception("Can't set user id, no session active."); }
 
 		# Set
-		$_SESSION['user']['id'] = filter_var($iId, FILTER_VALIDATE_INT) ?: 0;
+		$_SESSION[$this->_sPath][self::ID_PATH] = filter_var($iId, FILTER_VALIDATE_INT) ?: 0;
 
 		# Maintain chainability
 		return $this;
@@ -110,10 +119,10 @@ class User {
 		if(!$this->_oSession->isActive()) { throw new Exception("Can't get user login, no session active."); }
 
 		# No datas
-		if(empty($_SESSION['user']['login'])) { return ''; }
+		if(empty($_SESSION[$this->_sPath][self::LOGIN_PATH])) { return ''; }
 
 		# Retrieve
-		return (string) strtolower(filter_var($_SESSION['user']['login'], FILTER_VALIDATE_EMAIL));
+		return (string) strtolower(filter_var($_SESSION[$this->_sPath][self::LOGIN_PATH], FILTER_VALIDATE_EMAIL));
 
 	}
 
@@ -130,7 +139,7 @@ class User {
 		if(!$this->_oSession->isActive()) { throw new Exception("Can't set user login, no session active."); }
 
 		# Set
-		$_SESSION['user']['login'] = strtolower(filter_var($sEmail, FILTER_VALIDATE_EMAIL) ?: '');
+		$_SESSION[$this->_sPath][self::LOGIN_PATH] = strtolower(filter_var($sEmail, FILTER_VALIDATE_EMAIL) ?: '');
 
 		# Maintain chainability
 		return $this;
@@ -149,7 +158,7 @@ class User {
 		if(!$this->_oSession->isActive()) { throw new Exception("Can't delete user, no session active."); }
 
 		# Delete
-		unset($_SESSION['user']['login'], $_SESSION['user']['id'], $_SESSION['user']['connected']);
+		unset($_SESSION[$this->_sPath][self::LOGIN_PATH], $_SESSION[$this->_sPath][self::ID_PATH], $_SESSION[$this->_sPath][self::CONNECTED_PATH]);
 
 		# Maintain chainability
 		return $this;

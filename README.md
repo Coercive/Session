@@ -1,34 +1,32 @@
-Coercive Authentification Security
-==================================
+Coercive Session
+================
 
-Use PHP password hash system.
+Start and store basic items in session
 
 Get
 ---
 ```
-composer require coercive/authentification
+composer require coercive/session
 ```
 
 Usage
 -----
 ```php
-use Coercive\Security\Authentification\Authentification;
-$ObjectAuthentification = new Authentification();
+use Coercive\Security\Session\Config;
+use Coercive\Security\Session\Session;
 
-# EXAMPLE PASS
-$password = '1234hello_world';
+# Set your config options
+$Config = new Config();
+$Config->setAutoStartSession(true);
+$Config->setSessionDomain('.mywebsite.com');
+//...
 
-# HASH
-$hash = $ObjectAuthentification->hash($password);
+# Get your session handler
+$Session = new Session($Config);
 
-# VERIFY
-if($ObjectAuthentification->verify($password, $hash)) {
-    # Do something
-}
-
-# NEED UPDATE REHASH ?
-if($ObjectAuthentification->needsRehash($hash)) {
-    # Do something
+# And use ...
+if($Session->isActive()) {
+	// do something
 }
 
 ```

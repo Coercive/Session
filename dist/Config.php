@@ -35,6 +35,12 @@ class Config {
 	/** @var string IP Connection DB Table */
 	private $_sIpConnectionTable = 'IP_CONNECTION';
 
+	/** @var string User Session Path */
+	private $_sUserSessionPath = 'user';
+
+	/** @var string Redirect Session Path */
+	private $_sRedirectSessionPath = 'redirect';
+
 	/**
 	 * Config constructor.
 	 */
@@ -177,6 +183,28 @@ class Config {
 		return $this;
 	}
 
+	/**
+	 * SET USER SESSION PATH
+	 *
+	 * @param string $sPath
+	 * @return $this
+	 */
+	public function setUserSessionPath($sPath) {
+		$this->_sUserSessionPath = (string) $sPath;
+		return $this;
+	}
+
+	/**
+	 * SET REDIRECT SESSION PATH
+	 *
+	 * @param string $sPath
+	 * @return $this
+	 */
+	public function setRedirectSessionPath($sPath) {
+		$this->_sRedirectSessionPath = (string) $sPath;
+		return $this;
+	}
+
 ########################################################################################################################
 # GETTERS PART
 ########################################################################################################################
@@ -242,6 +270,20 @@ class Config {
 	 */
 	public function getIpConnectionTable() {
 		return $this->_sIpConnectionTable;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getUserSessionPath() {
+		return $this->_sUserSessionPath;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getRedirectSessionPath() {
+		return $this->_sRedirectSessionPath;
 	}
 
 }

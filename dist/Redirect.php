@@ -11,6 +11,9 @@ class Redirect {
 	/** @var Session */
 	private $_oSession = null;
 
+	/** @var string Session redirect path */
+	private $_sPath = '';
+
 	/**
 	 * Redirect constructor.
 	 *
@@ -18,6 +21,7 @@ class Redirect {
 	 */
 	public function __construct(Session $oSession) {
 		$this->_oSession = $oSession;
+		$this->_sPath = $oSession->Config()->getRedirectSessionPath();
 	}
 
 	/**
@@ -32,10 +36,10 @@ class Redirect {
 		if(!$this->_oSession->isActive()) { throw new Exception("Can't get redirect link, no session active."); }
 
 		# No datas
-		if(empty($_SESSION['redirectLink'])) { return '/'; }
+		if(empty($_SESSION[$this->_sPath])) { return '/'; }
 
 		# Retrieve
-		return (string) filter_var($_SESSION['redirectLink'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+		return (string) filter_var($_SESSION[$this->_sPath], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
 	}
 
@@ -52,7 +56,7 @@ class Redirect {
 		if(!$this->_oSession->isActive()) { throw new Exception("Can't set redirect link, no session active."); }
 
 		# Set
-		$_SESSION['redirectLink'] = (string) filter_var($sLink, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+		$_SESSION[$this->_sPath] = (string) filter_var($sLink, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
 		# Maintain chainability
 		return $this;
@@ -71,7 +75,7 @@ class Redirect {
 		if(!$this->_oSession->isActive()) { throw new Exception("Can't delete redirect link, no session active."); }
 
 		# Delete
-		unset($_SESSION['redirectLink']);
+		unset($_SESSION[$this->_sPath]);
 
 		# Maintain chainability
 		return $this;
