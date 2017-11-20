@@ -15,7 +15,7 @@
         "php": ">=7.0"
     },
     "autoload": {
-        "psr-4": { "Coercive\\Security\\Session\\": "" }
+        "psr-4": { "Coercive\\Security\\Session\\": "dist/" }
     },
     "minimum-stability" : "dev",
     "prefer-stable" : true,
