@@ -17,6 +17,9 @@ class Config {
 	/** @var string Init cookie domain */
 	private $_sCookieDomain = '';
 
+	/** @var string Init cookie path */
+	private $_sCookiePath = '';
+
 	/** @var string Init session path */
 	private $_sSessionPath = '';
 
@@ -41,16 +44,24 @@ class Config {
 	/** @var string Redirect Session Path */
 	private $_sRedirectSessionPath = 'redirect';
 
+	/** @var int Session Max Life Time */
+	private $_iSessionMaxLifeTime = 0;
+
+	/** @var int Cookie Life Time */
+	private $_iCookieLifeTime = 0;
+
+	/** @var bool Cookie Secure */
+	private $_bCookieSecure = false;
+
+	/** @var bool Cookie Http Only */
+	private $_bCookieHttpOnly = false;
+
 	/**
 	 * Config constructor.
 	 */
 	public function __construct() {
 		$this->_oSessionDate = new DateTime;
 	}
-
-########################################################################################################################
-# SETTERS PART
-########################################################################################################################
 
 	/**
 	 * AUTO START SESSION
@@ -63,6 +74,11 @@ class Config {
 	public function setAutoStartSession($bState) {
 		$this->_bActivate = (bool) $bState;
 		return $this;
+	}
+
+	/** @return bool */
+	public function isAutoStartSession() {
+		return $this->_bActivate;
 	}
 
 	/**
@@ -78,6 +94,11 @@ class Config {
 		return $this;
 	}
 
+	/** @return string */
+	public function getSessionDomain() {
+		return $this->_sSessionDomain;
+	}
+
 	/**
 	 * COOKIE DOMAIN
 	 *
@@ -89,6 +110,83 @@ class Config {
 	public function setCookieDomain($sDomain) {
 		$this->_sCookieDomain = (string) $sDomain;
 		return $this;
+	}
+
+	/** @return string */
+	public function getCookieDomain() {
+		return $this->_sCookieDomain;
+	}
+
+	/**
+	 * COOKIE DOMAIN
+	 *
+	 * Ini set cookie path
+	 *
+	 * @param string $sPath
+	 * @return $this
+	 */
+	public function setCookiePath($sPath) {
+		$this->_sCookiePath = (string) $sPath;
+		return $this;
+	}
+
+	/** @return string */
+	public function getCookiePath() {
+		return $this->_sCookiePath;
+	}
+
+	/**
+	 * SET COOKIE LIFE TIME
+	 *
+	 * Ini set cookie life time
+	 *
+	 * @param int $iSeconds
+	 * @return $this
+	 */
+	public function setCookieLifeTime($iSeconds) {
+		$this->_iCookieLifeTime = (int) $iSeconds;
+		return $this;
+	}
+
+	/** @return int */
+	public function getCookieLifeTime() {
+		return $this->_iCookieLifeTime;
+	}
+
+	/**
+	 * SET COOKIE SECURE
+	 *
+	 * Ini set cookie secure
+	 *
+	 * @param bool $bState
+	 * @return $this
+	 */
+	public function setCookieSecure($bState) {
+		$this->_bCookieSecure = (bool) $bState;
+		return $this;
+	}
+
+	/** @return bool */
+	public function getCookieSecure() {
+		return $this->_bCookieSecure;
+	}
+
+	/**
+	 * SET COOKIE HTTP ONLY
+	 *
+	 * Ini set cookie httponly
+	 *
+	 * @param bool $bState
+	 * @return $this
+	 */
+	public function setCookieHttpOnly($bState) {
+		$this->_bCookieHttpOnly = (bool) $bState;
+		return $this;
+	}
+
+	/** @return bool */
+	public function getCookieHttpOnly() {
+		return $this->_bCookieHttpOnly;
 	}
 
 	/**
@@ -104,6 +202,11 @@ class Config {
 		return $this;
 	}
 
+	/** @return string */
+	public function getSessionPath() {
+		return $this->_sSessionPath;
+	}
+
 	/**
 	 * SESSION NAME
 	 *
@@ -117,6 +220,11 @@ class Config {
 		return $this;
 	}
 
+	/** @return string */
+	public function getSessionName() {
+		return $this->_sSessionName;
+	}
+
 	/**
 	 * SESSION DATE
 	 *
@@ -128,6 +236,11 @@ class Config {
 	public function setSessionDate(DateTime $oDate) {
 		$this->_oSessionDate = $oDate;
 		return $this;
+	}
+
+	/** @return DateTime */
+	public function getSessionDate() {
+		return $this->_oSessionDate;
 	}
 
 	/**
@@ -161,6 +274,11 @@ class Config {
 		return $this;
 	}
 
+	/** @return bool */
+	public function getConnectionState() {
+		return $this->_bConnectionState;
+	}
+
 	/**
 	 * SET CONNECTION TABLE
 	 *
@@ -170,6 +288,11 @@ class Config {
 	public function setConnectionTable($sTableName) {
 		$this->_sConnectionTable = (string) $sTableName;
 		return $this;
+	}
+
+	/** @return string */
+	public function getConnectionTable() {
+		return $this->_sConnectionTable;
 	}
 
 	/**
@@ -183,6 +306,11 @@ class Config {
 		return $this;
 	}
 
+	/** @return string */
+	public function getIpConnectionTable() {
+		return $this->_sIpConnectionTable;
+	}
+
 	/**
 	 * SET USER SESSION PATH
 	 *
@@ -192,6 +320,11 @@ class Config {
 	public function setUserSessionPath($sPath) {
 		$this->_sUserSessionPath = (string) $sPath;
 		return $this;
+	}
+
+	/** @return string */
+	public function getUserSessionPath() {
+		return $this->_sUserSessionPath;
 	}
 
 	/**
@@ -205,85 +338,25 @@ class Config {
 		return $this;
 	}
 
-########################################################################################################################
-# GETTERS PART
-########################################################################################################################
-
-	/**
-	 * @return bool
-	 */
-	public function isAutoStartSession() {
-		return $this->_bActivate;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getSessionDomain() {
-		return $this->_sSessionDomain;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getCookieDomain() {
-		return $this->_sCookieDomain;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getSessionPath() {
-		return $this->_sSessionPath;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getSessionName() {
-		return $this->_sSessionName;
-	}
-
-	/**
-	 * @return DateTime
-	 */
-	public function getSessionDate() {
-		return $this->_oSessionDate;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getConnectionState() {
-		return $this->_bConnectionState;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getConnectionTable() {
-		return $this->_sConnectionTable;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getIpConnectionTable() {
-		return $this->_sIpConnectionTable;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getUserSessionPath() {
-		return $this->_sUserSessionPath;
-	}
-
-	/**
-	 * @return string
-	 */
+	/** @return string */
 	public function getRedirectSessionPath() {
 		return $this->_sRedirectSessionPath;
+	}
+
+	/**
+	 * SET SESSION MAX LIFE TIME
+	 *
+	 * @param int $iSeconds
+	 * @return $this
+	 */
+	public function setSessionMaxLifeTime($iSeconds) {
+		$this->_iSessionMaxLifeTime = (int) $iSeconds;
+		return $this;
+	}
+
+	/** @return int */
+	public function getSessionMaxLifeTime() {
+		return $this->_iSessionMaxLifeTime;
 	}
 
 }
