@@ -69,6 +69,31 @@ class Session {
 			$this->setSessionName($sSessionName);
 		}
 
+		# Ini set session max life time
+		if($iSessionMaxTime = $oConfig->getSessionName()) {
+			$this->setSessionMaxLifeTime($iSessionMaxTime);
+		}
+
+		# Ini set cookie life time
+		if($iCookieLifeTime = $oConfig->getCookieLifeTime()) {
+			$this->setCookieLifeTime($iCookieLifeTime);
+		}
+
+		# Ini set cookie path
+		if($sCookiePath = $oConfig->getCookiePath()) {
+			$this->setCookiePath($sCookiePath);
+		}
+
+		# Ini set cookie secure
+		if($bCookieSecure = $oConfig->getCookieSecure()) {
+			$this->setCookieSecure($bCookieSecure);
+		}
+
+		# Ini set cookie httponly
+		if($bCookieHttpOnly = $oConfig->getCookieHttpOnly()) {
+			$this->setCookieHttpOnly($bCookieHttpOnly);
+		}
+
 		# Start session with verification
 		if ($oConfig->isAutoStartSession()) {
 			$this->startSession();
@@ -168,6 +193,50 @@ class Session {
 	}
 
 	/**
+	 * SET COOKIE PATH
+	 *
+	 * @param string $sPath
+	 * @return $this
+	 */
+	public function setCookiePath($sPath) {
+		ini_set('session.cookie_path', "$sPath");
+		return $this;
+	}
+
+	/**
+	 * SET SESSION COOKIE LIFE TIME
+	 *
+	 * @param int $iSeconds
+	 * @return $this
+	 */
+	public function setCookieLifeTime($iSeconds) {
+		ini_set('session.cookie_lifetime', (int) $iSeconds);
+		return $this;
+	}
+
+	/**
+	 * SET SESSION COOKIE SECURE
+	 *
+	 * @param bool $bState
+	 * @return $this
+	 */
+	public function setCookieSecure($bState) {
+		ini_set('session.cookie_secure', (bool) $bState);
+		return $this;
+	}
+
+	/**
+	 * SET SESSION COOKIE HTTP ONLY
+	 *
+	 * @param bool $bState
+	 * @return $this
+	 */
+	public function setCookieHttpOnly($bState) {
+		ini_set('session.cookie_httponly', (bool) $bState);
+		return $this;
+	}
+
+	/**
 	 * SET SESSION PATH
 	 *
 	 * @param string $sSessionPath
@@ -186,6 +255,17 @@ class Session {
 	 */
 	public function setSessionName($sSessionName) {
 		ini_set('session.session_name', $sSessionName);
+		return $this;
+	}
+
+	/**
+	 * SET SESSION MAX LIFE TIME
+	 *
+	 * @param int $iSeconds
+	 * @return $this
+	 */
+	public function setSessionMaxLifeTime($iSeconds) {
+		ini_set('session.gc_maxlifetime', (int) $iSeconds);
 		return $this;
 	}
 
