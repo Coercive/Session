@@ -70,7 +70,7 @@ class Session {
 		}
 
 		# Ini set session max life time
-		if($iSessionMaxTime = $oConfig->getSessionName()) {
+		if($iSessionMaxTime = $oConfig->getSessionMaxLifeTime()) {
 			$this->setSessionMaxLifeTime($iSessionMaxTime);
 		}
 
