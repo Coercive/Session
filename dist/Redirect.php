@@ -1,85 +1,72 @@
 <?php
 namespace Coercive\Security\Session;
 
-use Exception;
-
 /**
- * @see \Coercive\Security\Session\Session
+ * @see Coercive\Security\Session\Session
  */
-class Redirect {
-
+class Redirect
+{
 	/** @var Session */
-	private $_oSession = null;
+	private $session = null;
 
 	/** @var string Session redirect path */
-	private $_sPath = '';
+	private $path = '';
 
 	/**
 	 * Redirect constructor.
 	 *
-	 * @param Session $oSession
+	 * @param Session $session
 	 */
-	public function __construct(Session $oSession) {
-		$this->_oSession = $oSession;
-		$this->_sPath = $oSession->Config()->getRedirectSessionPath();
+	public function __construct(Session $session)
+	{
+		$this->session = $session;
+		$this->path = $session->Config()->getRedirectSessionPath();
 	}
 
 	/**
 	 * GETTER REDIRECT LINK
 	 *
 	 * @return string
-	 * @throws Exception
 	 */
-	public function get() {
-
-		# Crash
-		if(!$this->_oSession->isActive()) { throw new Exception("Can't get redirect link, no session active."); }
-
+	public function get(): string
+	{
 		# No datas
-		if(empty($_SESSION[$this->_sPath])) { return '/'; }
+		if(!$this->session->isActive() || empty($_SESSION[$this->path])) { return '/'; }
 
 		# Retrieve
-		return (string) filter_var($_SESSION[$this->_sPath], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-
+		return (string) filter_var($_SESSION[$this->path], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 	}
 
 	/**
 	 * SETTER REDIRECT LINK
 	 *
-	 * @param string $sLink
+	 * @param string $link
 	 * @return $this
-	 * @throws Exception
 	 */
-	public function set($sLink) {
-
-		# Crash
-		if(!$this->_oSession->isActive()) { throw new Exception("Can't set redirect link, no session active."); }
-
+	public function set(string $link): Redirect
+	{
 		# Set
-		$_SESSION[$this->_sPath] = (string) filter_var($sLink, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+		if($this->session->isActive()) {
+			$_SESSION[$this->path] = (string) filter_var($link, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+		}
 
 		# Maintain chainability
 		return $this;
-
 	}
 
 	/**
 	 * DELETE REDIRECT LINK
 	 *
 	 * @return $this
-	 * @throws Exception
 	 */
-	public function delete() {
-
-		# Crash
-		if(!$this->_oSession->isActive()) { throw new Exception("Can't delete redirect link, no session active."); }
-
+	public function delete(): Redirect
+	{
 		# Delete
-		unset($_SESSION[$this->_sPath]);
+		if($this->session->isActive()) {
+			unset($_SESSION[$this->path]);
+		}
 
 		# Maintain chainability
 		return $this;
-
 	}
-
 }
