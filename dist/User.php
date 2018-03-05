@@ -8,6 +8,7 @@ class User
 {
 	const
 		CONNECTED_PATH = 'connected',
+		TIME_PATH = 'time',
 		TOKEN_PATH = 'token',
 		LOGIN_PATH = 'login',
 		ID_PATH = 'id';
@@ -77,14 +78,14 @@ class User
 	/**
 	 * SET USER ID
 	 *
-	 * @param int $iId
+	 * @param int $id
 	 * @return $this
 	 */
 	public function setId(int $id): User
 	{
 		# Set
 		if($this->session->isActive()) {
-			$_SESSION[$this->path][self::ID_PATH] = filter_var($iId, FILTER_VALIDATE_INT) ?: 0;
+			$_SESSION[$this->path][self::ID_PATH] = filter_var($id, FILTER_VALIDATE_INT) ?: 0;
 		}
 
 		# Maintain chainability
@@ -154,6 +155,37 @@ class User
 	}
 
 	/**
+	 * GET USER TIME
+	 *
+	 * @return int
+	 */
+	public function getTime(): int
+	{
+		# No datas
+		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::TIME_PATH])) { return 0; }
+
+		# Retrieve
+		return (int) filter_var($_SESSION[$this->path][self::TIME_PATH], FILTER_VALIDATE_INT);
+	}
+
+	/**
+	 * SET USER TIME
+	 *
+	 * @param int $time
+	 * @return $this
+	 */
+	public function setTime(int $time): User
+	{
+		# Set
+		if($this->session->isActive()) {
+			$_SESSION[$this->path][self::TIME_PATH] = filter_var($time, FILTER_VALIDATE_INT) ?: 0;
+		}
+
+		# Maintain chainability
+		return $this;
+	}
+
+	/**
 	 * DELETE USER
 	 *
 	 * @return $this
@@ -162,7 +194,7 @@ class User
 	{
 		# Delete
 		if($this->session->isActive()) {
-			unset($_SESSION[$this->path][self::LOGIN_PATH], $_SESSION[$this->path][self::ID_PATH], $_SESSION[$this->path][self::TOKEN_PATH], $_SESSION[$this->path][self::CONNECTED_PATH]);
+			unset($_SESSION[$this->path][self::LOGIN_PATH], $_SESSION[$this->path][self::ID_PATH], $_SESSION[$this->path][self::TOKEN_PATH], $_SESSION[$this->path][self::TIME_PATH], $_SESSION[$this->path][self::CONNECTED_PATH]);
 		}
 
 		# Maintain chainability
