@@ -11,43 +11,44 @@ use Exception;
  * @link		https://github.com/Coercive/Session
  *
  * @author  	Anthony Moral <contact@coercive.fr>
- * @copyright   2017 - 2018 Anthony Moral
- * @license 	http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ * @copyright   2018 Anthony Moral
+ * @license 	MIT
  */
-class Session {
-
+class Session
+{
 	/** @var Config */
-	private $_oConfig = null;
+	private $config = null;
 
 	/** @var DateTime */
-	private $_oDate = null;
+	private $date = null;
 
 	/** @var Redirect */
-	private $_oRedirect = null;
+	private $redirect = null;
 
 	/** @var User */
-	private $_oUser = null;
+	private $user = null;
 
 	/**
 	 * Vérifie la validité de l'ID de session
 	 *
 	 * @return bool
 	 */
-	private function _isValidId() {
+	private function _isValidId(): bool
+	{
 		return preg_match('/^[-,a-zA-Z0-9]{1,128}$/', session_id()) > 0;
 	}
 
 	/**
 	 * Session constructor.
 	 *
-	 * @param Config $oConfig [optional]
+	 * @param Config $conf [optional]
 	 * @throws Exception
 	 */
-	public function __construct(Config $oConfig = null) {
-
+	public function __construct(Config $conf = null)
+	{
 		# Autoload Config with default values
-		if(null === $oConfig) { $oConfig = new Config; }
-		$this->_oConfig = $oConfig;
+		if(null === $conf) { $conf = new Config; }
+		$this->config = $conf;
 
 		# Ini set custom session domain
 		if($sSessionDomain = $oConfig->getSessionDomain()) {
@@ -100,14 +101,13 @@ class Session {
 		}
 
 		# TimeStamp
-		$this->_oDate = $oConfig->getSessionDate();
+		$this->date = $conf->getSessionDate();
 
 		# Redirect
-		$this->_oRedirect = new Redirect($this);
+		$this->redirect = new Redirect($this);
 
 		# User
-		$this->_oUser = new User($this);
-
+		$this->user = new User($this);
 	}
 
 	/**
@@ -115,8 +115,9 @@ class Session {
 	 *
 	 * @return Config
 	 */
-	public function Config() {
-		return $this->_oConfig;
+	public function Config(): Config
+	{
+		return $this->config;
 	}
 
 	/**
@@ -124,8 +125,9 @@ class Session {
 	 *
 	 * @return Redirect
 	 */
-	public function Redirect() {
-		return $this->_oRedirect;
+	public function Redirect(): Redirect
+	{
+		return $this->redirect;
 	}
 
 	/**
@@ -133,8 +135,9 @@ class Session {
 	 *
 	 * @return User
 	 */
-	public function User() {
-		return $this->_oRedirect;
+	public function User(): User
+	{
+		return $this->user;
 	}
 
 	/**
@@ -142,7 +145,8 @@ class Session {
 	 *
 	 * @return bool
 	 */
-	public function isActive() {
+	public function isActive(): bool
+	{
 		return session_status() === PHP_SESSION_ACTIVE && session_id() !== '' && $this->_isValidId();
 	}
 
@@ -152,8 +156,8 @@ class Session {
 	 * @return $this
 	 * @throws Exception
 	 */
-	public function startSession() {
-
+	public function startSession(): Session
+	{
 		# Already
 		if($this->isActive()) { return $this; }
 
@@ -167,17 +171,17 @@ class Session {
 
 		# Maintain chainability
 		return $this;
-
 	}
 
 	/**
 	 * SET SESSION DOMAIN
 	 *
-	 * @param string $sSessionDomain
+	 * @param string $domain
 	 * @return $this
 	 */
-	public function setSessionDomain($sSessionDomain) {
-		ini_set('session.session_domain', "$sSessionDomain");
+	public function setSessionDomain(string $domain): Session
+	{
+		ini_set('session.session_domain', $domain);
 		return $this;
 	}
 
@@ -187,52 +191,9 @@ class Session {
 	 * @param string $sCookieDomain
 	 * @return $this
 	 */
-	public function setCookieDomain($sCookieDomain) {
-		ini_set('session.cookie_domain', "$sCookieDomain");
-		return $this;
-	}
-
-	/**
-	 * SET COOKIE PATH
-	 *
-	 * @param string $sPath
-	 * @return $this
-	 */
-	public function setCookiePath($sPath) {
-		ini_set('session.cookie_path', "$sPath");
-		return $this;
-	}
-
-	/**
-	 * SET SESSION COOKIE LIFE TIME
-	 *
-	 * @param int $iSeconds
-	 * @return $this
-	 */
-	public function setCookieLifeTime($iSeconds) {
-		ini_set('session.cookie_lifetime', (int) $iSeconds);
-		return $this;
-	}
-
-	/**
-	 * SET SESSION COOKIE SECURE
-	 *
-	 * @param bool $bState
-	 * @return $this
-	 */
-	public function setCookieSecure($bState) {
-		ini_set('session.cookie_secure', (bool) $bState);
-		return $this;
-	}
-
-	/**
-	 * SET SESSION COOKIE HTTP ONLY
-	 *
-	 * @param bool $bState
-	 * @return $this
-	 */
-	public function setCookieHttpOnly($bState) {
-		ini_set('session.cookie_httponly', (bool) $bState);
+	public function setCookieDomain(string $domain): Session
+	{
+		ini_set('session.cookie_domain', $domain);
 		return $this;
 	}
 
@@ -242,8 +203,69 @@ class Session {
 	 * @param string $sSessionPath
 	 * @return $this
 	 */
-	public function setSessionPath($sSessionPath) {
-		ini_set('session.save_path', $sSessionPath);
+	public function setSessionPath(string $path): Session
+	{
+		ini_set('session.save_path', $path);
+		return $this;
+	}
+
+	/**
+	 * SET COOKIE PATH
+	 *
+	 * @param string $path
+	 * @return $this
+	 */
+	public function setCookiePath(string $path): Session
+	{
+		ini_set('session.cookie_path', $path);
+		return $this;
+	}
+
+	/**
+	 * SET SESSION COOKIE LIFE TIME
+	 *
+	 * @param int $seconds
+	 * @return $this
+	 */
+	public function setCookieLifeTime(int $seconds): Session
+	{
+		ini_set('session.cookie_lifetime', $seconds);
+		return $this;
+	}
+
+	/**
+	 * SET SESSION COOKIE SECURE
+	 *
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setCookieSecure(bool $state): Session
+	{
+		ini_set('session.cookie_secure', $state);
+		return $this;
+	}
+
+	/**
+	 * SET SESSION COOKIE HTTP ONLY
+	 *
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setCookieHttpOnly(bool $state): Session
+	{
+		ini_set('session.cookie_httponly', $state);
+		return $this;
+	}
+
+	/**
+	 * SET SESSION MAX LIFE TIME
+	 *
+	 * @param int $seconds
+	 * @return $this
+	 */
+	public function setSessionMaxLifeTime(int $seconds): Session
+	{
+		ini_set('session.gc_maxlifetime', $seconds);
 		return $this;
 	}
 
@@ -253,19 +275,9 @@ class Session {
 	 * @param string $sSessionName
 	 * @return $this
 	 */
-	public function setSessionName($sSessionName) {
-		ini_set('session.session_name', $sSessionName);
-		return $this;
-	}
-
-	/**
-	 * SET SESSION MAX LIFE TIME
-	 *
-	 * @param int $iSeconds
-	 * @return $this
-	 */
-	public function setSessionMaxLifeTime($iSeconds) {
-		ini_set('session.gc_maxlifetime', (int) $iSeconds);
+	public function setSessionName(string $name): Session
+	{
+		ini_set('session.session_name', $name);
 		return $this;
 	}
 
@@ -275,8 +287,9 @@ class Session {
 	 * @param DateTime $oDate
 	 * @return $this
 	 */
-	public function setSessionDate(DateTime $oDate) {
-		$this->_oDate = $oDate;
+	public function setSessionDate(DateTime $date): Session
+	{
+		$this->date = $date;
 		return $this;
 	}
 
@@ -285,7 +298,8 @@ class Session {
 	 *
 	 * @return string
 	 */
-	public function getSessionId() {
+	public function getSessionId(): string
+	{
 		return $this->isActive() ? session_id() : null;
 	}
 
@@ -294,9 +308,9 @@ class Session {
 	 *
 	 * @return $this
 	 */
-	public function regenerateId() {
+	public function regenerateId(): Session
+	{
 		if($this->isActive()) { session_regenerate_id(); }
 		return $this;
 	}
-
 }
