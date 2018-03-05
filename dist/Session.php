@@ -51,52 +51,52 @@ class Session
 		$this->config = $conf;
 
 		# Ini set custom session domain
-		if($sSessionDomain = $oConfig->getSessionDomain()) {
+		if($sSessionDomain = $conf->getSessionDomain()) {
 			$this->setSessionDomain($sSessionDomain);
 		}
 
 		# Ini set custom cookie domain
-		if($sCookieDomain = $oConfig->getCookieDomain()) {
+		if($sCookieDomain = $conf->getCookieDomain()) {
 			$this->setCookieDomain($sCookieDomain);
 		}
 
 		# Ini set custom session path
-		if($sSessionPath = $oConfig->getSessionDomain()) {
+		if($sSessionPath = $conf->getSessionDomain()) {
 			$this->setSessionPath($sSessionPath);
 		}
 
 		# Ini set custom session name
-		if($sSessionName = $oConfig->getSessionName()) {
+		if($sSessionName = $conf->getSessionName()) {
 			$this->setSessionName($sSessionName);
 		}
 
 		# Ini set session max life time
-		if($iSessionMaxTime = $oConfig->getSessionMaxLifeTime()) {
+		if($iSessionMaxTime = $conf->getSessionMaxLifeTime()) {
 			$this->setSessionMaxLifeTime($iSessionMaxTime);
 		}
 
 		# Ini set cookie life time
-		if($iCookieLifeTime = $oConfig->getCookieLifeTime()) {
+		if($iCookieLifeTime = $conf->getCookieLifeTime()) {
 			$this->setCookieLifeTime($iCookieLifeTime);
 		}
 
 		# Ini set cookie path
-		if($sCookiePath = $oConfig->getCookiePath()) {
+		if($sCookiePath = $conf->getCookiePath()) {
 			$this->setCookiePath($sCookiePath);
 		}
 
 		# Ini set cookie secure
-		if($bCookieSecure = $oConfig->getCookieSecure()) {
+		if($bCookieSecure = $conf->getCookieSecure()) {
 			$this->setCookieSecure($bCookieSecure);
 		}
 
 		# Ini set cookie httponly
-		if($bCookieHttpOnly = $oConfig->getCookieHttpOnly()) {
+		if($bCookieHttpOnly = $conf->getCookieHttpOnly()) {
 			$this->setCookieHttpOnly($bCookieHttpOnly);
 		}
 
 		# Start session with verification
-		if ($oConfig->isAutoStartSession()) {
+		if ($conf->isAutoStartSession()) {
 			$this->startSession();
 		}
 
