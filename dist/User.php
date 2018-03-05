@@ -162,7 +162,7 @@ class User
 	{
 		# Delete
 		if($this->session->isActive()) {
-			unset($_SESSION[$this->path][self::LOGIN_PATH], $_SESSION[$this->path][self::ID_PATH], $_SESSION[$this->path][self::CONNECTED_PATH]);
+			unset($_SESSION[$this->path][self::LOGIN_PATH], $_SESSION[$this->path][self::ID_PATH], $_SESSION[$this->path][self::TOKEN_PATH], $_SESSION[$this->path][self::CONNECTED_PATH]);
 		}
 
 		# Maintain chainability
