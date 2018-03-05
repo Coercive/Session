@@ -8,6 +8,7 @@ class User
 {
 	const
 		CONNECTED_PATH = 'connected',
+		LANGUAGE_PATH = 'time',
 		TIME_PATH = 'time',
 		TOKEN_PATH = 'token',
 		LOGIN_PATH = 'login',
@@ -109,14 +110,14 @@ class User
 	/**
 	 * SET USER LOGIN
 	 *
-	 * @param string $sEmail
+	 * @param string $email
 	 * @return $this
 	 */
 	public function setLogin(string $email): User
 	{
 		# Set
 		if($this->session->isActive()) {
-			$_SESSION[$this->path][self::LOGIN_PATH] = strtolower(filter_var($sEmail, FILTER_VALIDATE_EMAIL) ?: '');
+			$_SESSION[$this->path][self::LOGIN_PATH] = strtolower(filter_var($email, FILTER_VALIDATE_EMAIL) ?: '');
 		}
 
 		# Maintain chainability
@@ -186,6 +187,37 @@ class User
 	}
 
 	/**
+	 * GET USER LANGUAGE
+	 *
+	 * @return string
+	 */
+	public function getLanguage(): string
+	{
+		# No datas
+		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::LANGUAGE_PATH])) { return ''; }
+
+		# Retrieve
+		return (string) filter_var($_SESSION[$this->path][self::LANGUAGE_PATH], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+	}
+
+	/**
+	 * SET USER LANGUAGE
+	 *
+	 * @param string $lang
+	 * @return $this
+	 */
+	public function setLanguage(string $lang): User
+	{
+		# Set
+		if($this->session->isActive()) {
+			$_SESSION[$this->path][self::LANGUAGE_PATH] = filter_var($lang, FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?: '';
+		}
+
+		# Maintain chainability
+		return $this;
+	}
+
+	/**
 	 * DELETE USER
 	 *
 	 * @return $this
@@ -194,7 +226,7 @@ class User
 	{
 		# Delete
 		if($this->session->isActive()) {
-			unset($_SESSION[$this->path][self::LOGIN_PATH], $_SESSION[$this->path][self::ID_PATH], $_SESSION[$this->path][self::TOKEN_PATH], $_SESSION[$this->path][self::TIME_PATH], $_SESSION[$this->path][self::CONNECTED_PATH]);
+			unset($_SESSION[$this->path]);
 		}
 
 		# Maintain chainability
