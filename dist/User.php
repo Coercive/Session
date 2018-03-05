@@ -148,7 +148,7 @@ class User
 	{
 		# Set
 		if($this->session->isActive()) {
-			$_SESSION[$this->path][self::LOGIN_PATH] = filter_var($token, FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?: '';
+			$_SESSION[$this->path][self::TOKEN_PATH] = filter_var($token, FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?: '';
 		}
 
 		# Maintain chainability
