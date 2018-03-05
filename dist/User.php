@@ -1,51 +1,46 @@
 <?php
 namespace Coercive\Security\Session;
 
-use Exception;
-
 /**
  * @see \Coercive\Security\Session\Session
  */
-class User {
-
+class User
+{
 	const
 		CONNECTED_PATH = 'connected',
+		TOKEN_PATH = 'token',
 		LOGIN_PATH = 'login',
 		ID_PATH = 'id';
 
 	/** @var Session */
-	private $_oSession = null;
+	private $session = null;
 
 	/** @var string Session user path */
-	private $_sPath = '';
+	private $path = '';
 
 	/**
 	 * User constructor.
 	 *
-	 * @param Session $oSession
+	 * @param Session $session
 	 */
-	public function __construct(Session $oSession) {
-		$this->_oSession = $oSession;
-		$this->_sPath = $oSession->Config()->getUserSessionPath();
+	public function __construct(Session $session)
+	{
+		$this->session = $session;
+		$this->path = $session->Config()->getUserSessionPath();
 	}
 
 	/**
 	 * IS CONNECTED STATE
 	 *
 	 * @return bool
-	 * @throws Exception
 	 */
-	public function isConnected() {
-
-		# Crash
-		if(!$this->_oSession->isActive()) { throw new Exception("Can't get user connected state, no session active."); }
-
+	public function isConnected(): bool
+	{
 		# No datas
-		if(empty($_SESSION[$this->_sPath][self::CONNECTED_PATH])) { return false; }
+		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::CONNECTED_PATH])) { return false; }
 
 		# Retrieve
-		return (bool) $_SESSION[$this->_sPath][self::CONNECTED_PATH];
-
+		return (bool) $_SESSION[$this->path][self::CONNECTED_PATH];
 	}
 
 	/**
@@ -53,38 +48,30 @@ class User {
 	 *
 	 * @param bool $bState
 	 * @return $this
-	 * @throws Exception
 	 */
-	public function setConnectedState($bState) {
-
-		# Crash
-		if(!$this->_oSession->isActive()) { throw new Exception("Can't set user connected state, no session active."); }
-
+	public function setConnectedState(bool $state): User
+	{
 		# Set
-		$_SESSION[$this->_sPath][self::CONNECTED_PATH] = (bool) $bState;
+		if($this->session->isActive()) {
+			$_SESSION[$this->path][self::CONNECTED_PATH] = (bool) $state;
+		}
 
 		# Maintain chainability
 		return $this;
-
 	}
 
 	/**
 	 * GET USER ID
 	 *
 	 * @return int
-	 * @throws Exception
 	 */
-	public function getId() {
-
-		# Crash
-		if(!$this->_oSession->isActive()) { throw new Exception("Can't get user id, no session active."); }
-
+	public function getId(): int
+	{
 		# No datas
-		if(empty($_SESSION[$this->_sPath][self::ID_PATH])) { return 0; }
+		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::ID_PATH])) { return 0; }
 
 		# Retrieve
-		return (int) filter_var($_SESSION[$this->_sPath][self::ID_PATH], FILTER_VALIDATE_INT);
-
+		return (int) filter_var($_SESSION[$this->path][self::ID_PATH], FILTER_VALIDATE_INT);
 	}
 
 	/**
@@ -92,38 +79,30 @@ class User {
 	 *
 	 * @param int $iId
 	 * @return $this
-	 * @throws Exception
 	 */
-	public function setId($iId) {
-
-		# Crash
-		if(!$this->_oSession->isActive()) { throw new Exception("Can't set user id, no session active."); }
-
+	public function setId(int $id): User
+	{
 		# Set
-		$_SESSION[$this->_sPath][self::ID_PATH] = filter_var($iId, FILTER_VALIDATE_INT) ?: 0;
+		if($this->session->isActive()) {
+			$_SESSION[$this->path][self::ID_PATH] = filter_var($iId, FILTER_VALIDATE_INT) ?: 0;
+		}
 
 		# Maintain chainability
 		return $this;
-
 	}
 
 	/**
 	 * GET USER LOGIN
 	 *
 	 * @return string
-	 * @throws Exception
 	 */
-	public function getLogin() {
-
-		# Crash
-		if(!$this->_oSession->isActive()) { throw new Exception("Can't get user login, no session active."); }
-
+	public function getLogin(): string
+	{
 		# No datas
-		if(empty($_SESSION[$this->_sPath][self::LOGIN_PATH])) { return ''; }
+		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::LOGIN_PATH])) { return ''; }
 
 		# Retrieve
-		return (string) strtolower(filter_var($_SESSION[$this->_sPath][self::LOGIN_PATH], FILTER_VALIDATE_EMAIL));
-
+		return (string) strtolower(filter_var($_SESSION[$this->path][self::LOGIN_PATH], FILTER_VALIDATE_EMAIL));
 	}
 
 	/**
@@ -131,38 +110,62 @@ class User {
 	 *
 	 * @param string $sEmail
 	 * @return $this
-	 * @throws Exception
 	 */
-	public function setLogin($sEmail) {
-
-		# Crash
-		if(!$this->_oSession->isActive()) { throw new Exception("Can't set user login, no session active."); }
-
+	public function setLogin(string $email): User
+	{
 		# Set
-		$_SESSION[$this->_sPath][self::LOGIN_PATH] = strtolower(filter_var($sEmail, FILTER_VALIDATE_EMAIL) ?: '');
+		if($this->session->isActive()) {
+			$_SESSION[$this->path][self::LOGIN_PATH] = strtolower(filter_var($sEmail, FILTER_VALIDATE_EMAIL) ?: '');
+		}
 
 		# Maintain chainability
 		return $this;
+	}
 
+	/**
+	 * GET USER TOKEN
+	 *
+	 * @return string
+	 */
+	public function getToken(): string
+	{
+		# No datas
+		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::TOKEN_PATH])) { return ''; }
+
+		# Retrieve
+		return (string) filter_var($_SESSION[$this->path][self::TOKEN_PATH], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+	}
+
+	/**
+	 * SET USER TOKEN
+	 *
+	 * @param string $token
+	 * @return $this
+	 */
+	public function setToken(string $token): User
+	{
+		# Set
+		if($this->session->isActive()) {
+			$_SESSION[$this->path][self::LOGIN_PATH] = filter_var($token, FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?: '';
+		}
+
+		# Maintain chainability
+		return $this;
 	}
 
 	/**
 	 * DELETE USER
 	 *
 	 * @return $this
-	 * @throws Exception
 	 */
-	public function delete() {
-
-		# Crash
-		if(!$this->_oSession->isActive()) { throw new Exception("Can't delete user, no session active."); }
-
+	public function delete(): User
+	{
 		# Delete
-		unset($_SESSION[$this->_sPath][self::LOGIN_PATH], $_SESSION[$this->_sPath][self::ID_PATH], $_SESSION[$this->_sPath][self::CONNECTED_PATH]);
+		if($this->session->isActive()) {
+			unset($_SESSION[$this->path][self::LOGIN_PATH], $_SESSION[$this->path][self::ID_PATH], $_SESSION[$this->path][self::CONNECTED_PATH]);
+		}
 
 		# Maintain chainability
 		return $this;
-
 	}
-
 }
