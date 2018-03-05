@@ -131,7 +131,7 @@ class Session {
 	/**
 	 * GET USER
 	 *
-	 * @return Redirect
+	 * @return User
 	 */
 	public function User() {
 		return $this->_oRedirect;
