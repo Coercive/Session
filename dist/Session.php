@@ -61,7 +61,7 @@ class Session
 		}
 
 		# Ini set custom session path
-		if($sSessionPath = $conf->getSessionDomain()) {
+		if($sSessionPath = $conf->getSessionPath()) {
 			$this->setSessionPath($sSessionPath);
 		}
 
