@@ -8,7 +8,7 @@ class User
 {
 	const
 		CONNECTED_PATH = 'connected',
-		LANGUAGE_PATH = 'time',
+		LANGUAGE_PATH = 'language',
 		TIME_PATH = 'time',
 		TOKEN_PATH = 'token',
 		LOGIN_PATH = 'login',
