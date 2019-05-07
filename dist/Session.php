@@ -91,6 +91,21 @@ class Session
 			$this->setCookieHttpOnly($cookieHttpOnly);
 		}
 
+		# Ini set use strict mode
+		if(null !== ($useStrict = $conf->getUseStrictMode())) {
+			$this->setUseStrictMode($useStrict);
+		}
+
+		# Ini set gc probability
+		if(null !== ($gcProbability = $conf->getGcProbability())) {
+			$this->setGcProbability($gcProbability);
+		}
+
+		# Ini set gc divisor
+		if(null !== ($gcDivisor = $conf->getGcDivisor())) {
+			$this->setGcDivisor($gcDivisor);
+		}
+
 		# Start session with verification
 		if($conf->isAutoStartSession()) {
 			$this->startSession();
@@ -254,6 +269,18 @@ class Session
 	}
 
 	/**
+	 * SET SESSION USE STRICT MODE
+	 *
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setUseStrictMode(bool $state): Session
+	{
+		ini_set('session.use_strict_mode', $state);
+		return $this;
+	}
+
+	/**
 	 * SET SESSION MAX LIFE TIME
 	 *
 	 * @param int $seconds
@@ -262,6 +289,30 @@ class Session
 	public function setSessionMaxLifeTime(int $seconds): Session
 	{
 		ini_set('session.gc_maxlifetime', $seconds);
+		return $this;
+	}
+
+	/**
+	 * SET SESSION GARBAGE COLLECTOR PROBABILITY
+	 *
+	 * @param int $percent
+	 * @return $this
+	 */
+	public function setGcProbability(int $percent): Session
+	{
+		ini_set('session.gc_probability', $percent);
+		return $this;
+	}
+
+	/**
+	 * SET SESSION GARBAGE COLLECTOR DIVISOR
+	 *
+	 * @param int $percent
+	 * @return $this
+	 */
+	public function setGcDivisor(int $percent): Session
+	{
+		ini_set('session.gc_divisor', $percent);
 		return $this;
 	}
 
