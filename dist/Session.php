@@ -46,6 +46,8 @@ class Session
 	 */
 	public function __construct(Config $conf)
 	{
+		$this->config = $conf;
+
 		# Ini set custom session domain
 		if(null !== ($sessionDomain = $conf->getSessionDomain())) {
 			$this->setSessionDomain($sessionDomain);
