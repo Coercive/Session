@@ -34,11 +34,20 @@ class Config
 	/** @var bool Init Cookie Http Only */
 	private $cookieHttpOnly = false;
 
-	/** @var int Session Max Life Time */
+	/** @var int Init Session Max Life Time */
 	private $sessionMaxLifeTime = null;
 
-	/** @var int Cookie Life Time */
+	/** @var int Init Cookie Life Time */
 	private $cookieLifeTime = null;
+
+	/** @var int Init GC Probability */
+	private $gcProbability = null;
+
+	/** @var int Init GC Divisor */
+	private $gcDivisor = null;
+
+	/** @var bool Init Use Strict Mode */
+	private $useStrictMode = null;
 
 	# Options
 
@@ -70,27 +79,7 @@ class Config
 		$this->sessionDate = new DateTime;
 	}
 
-	/**
-	 * AUTO START SESSION
-	 *
-	 * The session objet will init session if not already active
-	 *
-	 * @param bool $state
-	 * @return $this
-	 */
-	public function setAutoStartSession(bool $state): Config
-	{
-		$this->activate = $state;
-		return $this;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function isAutoStartSession(): bool
-	{
-		return $this->activate;
-	}
+# INIT ####################################################################################################################################
 
 	/**
 	 * SESSION DOMAIN
@@ -225,6 +214,28 @@ class Config
 	}
 
 	/**
+	 * SET USE STRICT MODE
+	 *
+	 * Ini set use strict mode
+	 *
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setUseStrictMode(bool $state): Config
+	{
+		$this->useStrictMode = $state;
+		return $this;
+	}
+
+	/**
+	 * @return bool|null
+	 */
+	public function getUseStrictMode()
+	{
+		return $this->useStrictMode;
+	}
+
+	/**
 	 * SESSION PATH
 	 *
 	 * Ini set session save path
@@ -288,6 +299,90 @@ class Config
 	public function getSessionDate(): DateTime
 	{
 		return $this->sessionDate;
+	}
+
+	/**
+	 * SET SESSION MAX LIFE TIME
+	 *
+	 * @param int $seconds
+	 * @return $this
+	 */
+	public function setSessionMaxLifeTime(int $seconds): Config
+	{
+		$this->sessionMaxLifeTime = $seconds;
+		return $this;
+	}
+
+	/**
+	 * @return int|null
+	 */
+	public function getSessionMaxLifeTime()
+	{
+		return $this->sessionMaxLifeTime;
+	}
+
+	/**
+	 * SET GC PROBABILITY
+	 *
+	 * @param int $percent
+	 * @return $this
+	 */
+	public function setGcProbability(int $percent): Config
+	{
+		$this->gcProbability = $percent;
+		return $this;
+	}
+
+	/**
+	 * @return int|null
+	 */
+	public function getGcProbability()
+	{
+		return $this->gcProbability;
+	}
+
+	/**
+	 * SET GC PROBABILITY
+	 *
+	 * @param int $percent
+	 * @return $this
+	 */
+	public function setGcDivisor(int $percent): Config
+	{
+		$this->gcDivisor = $percent;
+		return $this;
+	}
+
+	/**
+	 * @return int|null
+	 */
+	public function getGcDivisor()
+	{
+		return $this->gcDivisor;
+	}
+
+# OPTIONS #################################################################################################################################
+
+	/**
+	 * AUTO START SESSION
+	 *
+	 * The session objet will init session if not already active
+	 *
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setAutoStartSession(bool $state): Config
+	{
+		$this->activate = $state;
+		return $this;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isAutoStartSession(): bool
+	{
+		return $this->activate;
 	}
 
 	/**
@@ -410,25 +505,5 @@ class Config
 	public function getRedirectSessionPath(): string
 	{
 		return $this->redirectSessionPath;
-	}
-
-	/**
-	 * SET SESSION MAX LIFE TIME
-	 *
-	 * @param int $seconds
-	 * @return $this
-	 */
-	public function setSessionMaxLifeTime(int $seconds): Config
-	{
-		$this->sessionMaxLifeTime = $seconds;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getSessionMaxLifeTime(): int
-	{
-		return $this->sessionMaxLifeTime;
 	}
 }
