@@ -6,61 +6,68 @@ use DateTime;
 /**
  * @see \Coercive\Security\Session\Session
  */
-class Config {
-
-	/** @var bool If the session will autostart or not */
-	private $_bActivate = true;
+class Config
+{
+	# INIT SET
 
 	/** @var string Init session domain */
-	private $_sSessionDomain = '';
+	private $sessionDomain = null;
 
 	/** @var string Init cookie domain */
-	private $_sCookieDomain = '';
+	private $cookieDomain = null;
 
 	/** @var string Init cookie path */
-	private $_sCookiePath = '';
+	private $cookiePath = null;
 
 	/** @var string Init session path */
-	private $_sSessionPath = '';
+	private $sessionPath = null;
 
 	/** @var string Init session name */
-	private $_sSessionName = '';
+	private $sessionName = null;
 
 	/** @var DateTime Init session date */
-	private $_oSessionDate = null;
+	private $sessionDate = null;
 
-	/** @var bool Connection State */
-	private $_bConnectionState = false;
+	/** @var bool Init Cookie Secure */
+	private $cookieSecure = false;
 
-	/** @var string Connection DB Table */
-	private $_sConnectionTable = 'CONNECTION';
-
-	/** @var string IP Connection DB Table */
-	private $_sIpConnectionTable = 'IP_CONNECTION';
-
-	/** @var string User Session Path */
-	private $_sUserSessionPath = 'user';
-
-	/** @var string Redirect Session Path */
-	private $_sRedirectSessionPath = 'redirect';
+	/** @var bool Init Cookie Http Only */
+	private $cookieHttpOnly = false;
 
 	/** @var int Session Max Life Time */
-	private $_iSessionMaxLifeTime = 0;
+	private $sessionMaxLifeTime = null;
 
 	/** @var int Cookie Life Time */
-	private $_iCookieLifeTime = 0;
+	private $cookieLifeTime = null;
 
-	/** @var bool Cookie Secure */
-	private $_bCookieSecure = false;
+	# Options
 
-	/** @var bool Cookie Http Only */
-	private $_bCookieHttpOnly = false;
+	/** @var bool If the session will autostart or not */
+	private $activate = true;
+
+	/** @var bool Connection State */
+	private $connectionState = false;
+
+	/** @var string Connection DB Table */
+	private $connectionTable = 'CONNECTION';
+
+	/** @var string IP Connection DB Table */
+	private $ipConnectionTable = 'IP_CONNECTION';
+
+	/** @var string User Session Path */
+	private $userSessionPath = 'user';
+
+	/** @var string Redirect Session Path */
+	private $redirectSessionPath = 'redirect';
 
 	/**
 	 * Config constructor.
+	 *
+	 * @return void
 	 */
-	public function __construct() {
-		$this->_oSessionDate = new DateTime;
+	public function __construct()
+	{
+		$this->sessionDate = new DateTime;
 	}
 
 	/**
@@ -68,17 +75,21 @@ class Config {
 	 *
 	 * The session objet will init session if not already active
 	 *
-	 * @param bool $bState
+	 * @param bool $state
 	 * @return $this
 	 */
-	public function setAutoStartSession($bState) {
-		$this->_bActivate = (bool) $bState;
+	public function setAutoStartSession(bool $state): Config
+	{
+		$this->activate = $state;
 		return $this;
 	}
 
-	/** @return bool */
-	public function isAutoStartSession() {
-		return $this->_bActivate;
+	/**
+	 * @return bool
+	 */
+	public function isAutoStartSession(): bool
+	{
+		return $this->activate;
 	}
 
 	/**
@@ -86,17 +97,21 @@ class Config {
 	 *
 	 * Ini set session domain
 	 *
-	 * @param string $sDomain
+	 * @param string $domain
 	 * @return $this
 	 */
-	public function setSessionDomain($sDomain) {
-		$this->_sSessionDomain = (string) $sDomain;
+	public function setSessionDomain(string $domain): Config
+	{
+		$this->sessionDomain = $domain;
 		return $this;
 	}
 
-	/** @return string */
-	public function getSessionDomain() {
-		return $this->_sSessionDomain;
+	/**
+	 * @return string|null
+	 */
+	public function getSessionDomain()
+	{
+		return $this->sessionDomain;
 	}
 
 	/**
@@ -104,17 +119,21 @@ class Config {
 	 *
 	 * Ini set cookie domain
 	 *
-	 * @param string $sDomain
+	 * @param string $domain
 	 * @return $this
 	 */
-	public function setCookieDomain($sDomain) {
-		$this->_sCookieDomain = (string) $sDomain;
+	public function setCookieDomain(string $domain): Config
+	{
+		$this->cookieDomain = $domain;
 		return $this;
 	}
 
-	/** @return string */
-	public function getCookieDomain() {
-		return $this->_sCookieDomain;
+	/**
+	 * @return string|null
+	 */
+	public function getCookieDomain()
+	{
+		return $this->cookieDomain;
 	}
 
 	/**
@@ -122,17 +141,21 @@ class Config {
 	 *
 	 * Ini set cookie path
 	 *
-	 * @param string $sPath
+	 * @param string $path
 	 * @return $this
 	 */
-	public function setCookiePath($sPath) {
-		$this->_sCookiePath = (string) $sPath;
+	public function setCookiePath(string $path): Config
+	{
+		$this->cookiePath = $path;
 		return $this;
 	}
 
-	/** @return string */
-	public function getCookiePath() {
-		return $this->_sCookiePath;
+	/**
+	 * @return string|null
+	 */
+	public function getCookiePath()
+	{
+		return $this->cookiePath;
 	}
 
 	/**
@@ -140,17 +163,21 @@ class Config {
 	 *
 	 * Ini set cookie life time
 	 *
-	 * @param int $iSeconds
+	 * @param int $seconds
 	 * @return $this
 	 */
-	public function setCookieLifeTime($iSeconds) {
-		$this->_iCookieLifeTime = (int) $iSeconds;
+	public function setCookieLifeTime(int $seconds): Config
+	{
+		$this->cookieLifeTime = $seconds;
 		return $this;
 	}
 
-	/** @return int */
-	public function getCookieLifeTime() {
-		return $this->_iCookieLifeTime;
+	/**
+	 * @return int|null
+	 */
+	public function getCookieLifeTime()
+	{
+		return $this->cookieLifeTime;
 	}
 
 	/**
@@ -158,17 +185,21 @@ class Config {
 	 *
 	 * Ini set cookie secure
 	 *
-	 * @param bool $bState
+	 * @param bool $state
 	 * @return $this
 	 */
-	public function setCookieSecure($bState) {
-		$this->_bCookieSecure = (bool) $bState;
+	public function setCookieSecure(bool $state): Config
+	{
+		$this->cookieSecure = $state;
 		return $this;
 	}
 
-	/** @return bool */
-	public function getCookieSecure() {
-		return $this->_bCookieSecure;
+	/**
+	 * @return bool|null
+	 */
+	public function getCookieSecure()
+	{
+		return $this->cookieSecure;
 	}
 
 	/**
@@ -176,17 +207,21 @@ class Config {
 	 *
 	 * Ini set cookie httponly
 	 *
-	 * @param bool $bState
+	 * @param bool $state
 	 * @return $this
 	 */
-	public function setCookieHttpOnly($bState) {
-		$this->_bCookieHttpOnly = (bool) $bState;
+	public function setCookieHttpOnly(bool $state): Config
+	{
+		$this->cookieHttpOnly = $state;
 		return $this;
 	}
 
-	/** @return bool */
-	public function getCookieHttpOnly() {
-		return $this->_bCookieHttpOnly;
+	/**
+	 * @return bool|null
+	 */
+	public function getCookieHttpOnly()
+	{
+		return $this->cookieHttpOnly;
 	}
 
 	/**
@@ -194,17 +229,21 @@ class Config {
 	 *
 	 * Ini set session save path
 	 *
-	 * @param string $sPath
+	 * @param string $path
 	 * @return $this
 	 */
-	public function setSessionPath($sPath) {
-		$this->_sSessionPath = (string) $sPath;
+	public function setSessionPath(string $path): Config
+	{
+		$this->sessionPath = $path;
 		return $this;
 	}
 
-	/** @return string */
-	public function getSessionPath() {
-		return $this->_sSessionPath;
+	/**
+	 * @return string|null
+	 */
+	public function getSessionPath()
+	{
+		return $this->sessionPath;
 	}
 
 	/**
@@ -212,17 +251,21 @@ class Config {
 	 *
 	 * Ini set session name
 	 *
-	 * @param string $sName
+	 * @param string $name
 	 * @return $this
 	 */
-	public function setSessionName($sName) {
-		$this->_sSessionName = (string) $sName;
+	public function setSessionName(string $name): Config
+	{
+		$this->sessionName = $name;
 		return $this;
 	}
 
-	/** @return string */
-	public function getSessionName() {
-		return $this->_sSessionName;
+	/**
+	 * @return string|null
+	 */
+	public function getSessionName()
+	{
+		return $this->sessionName;
 	}
 
 	/**
@@ -230,27 +273,32 @@ class Config {
 	 *
 	 * Ini set session date
 	 *
-	 * @param DateTime $oDate
+	 * @param DateTime $date
 	 * @return $this
 	 */
-	public function setSessionDate(DateTime $oDate) {
-		$this->_oSessionDate = $oDate;
+	public function setSessionDate(DateTime $date): Config
+	{
+		$this->sessionDate = $date;
 		return $this;
 	}
 
-	/** @return DateTime */
-	public function getSessionDate() {
-		return $this->_oSessionDate;
+	/**
+	 * @return DateTime
+	 */
+	public function getSessionDate(): DateTime
+	{
+		return $this->sessionDate;
 	}
 
 	/**
 	 * SET CONNECTION STATE
 	 *
-	 * @param bool $bState
+	 * @param bool $state
 	 * @return $this
 	 */
-	public function setConnection($bState) {
-		$this->_bConnectionState = (bool) $bState;
+	public function setConnection(bool $state): Config
+	{
+		$this->connectionState = $state;
 		return $this;
 	}
 
@@ -259,8 +307,9 @@ class Config {
 	 *
 	 * @return $this
 	 */
-	public function enableConnection() {
-		$this->_bConnectionState = true;
+	public function enableConnection(): Config
+	{
+		$this->connectionState = true;
 		return $this;
 	}
 
@@ -269,94 +318,117 @@ class Config {
 	 *
 	 * @return $this
 	 */
-	public function disableConnection() {
-		$this->_bConnectionState = false;
+	public function disableConnection(): Config
+	{
+		$this->connectionState = false;
 		return $this;
 	}
 
-	/** @return bool */
-	public function getConnectionState() {
-		return $this->_bConnectionState;
+	/**
+	 * @return bool
+	 */
+	public function getConnectionState(): bool
+	{
+		return $this->connectionState;
 	}
 
 	/**
 	 * SET CONNECTION TABLE
 	 *
-	 * @param string $sTableName
+	 * @param string $name
 	 * @return $this
 	 */
-	public function setConnectionTable($sTableName) {
-		$this->_sConnectionTable = (string) $sTableName;
+	public function setConnectionTable(string $name): Config
+	{
+		$this->connectionTable = $name;
 		return $this;
 	}
 
-	/** @return string */
-	public function getConnectionTable() {
-		return $this->_sConnectionTable;
+	/**
+	 * @return string
+	 */
+	public function getConnectionTable(): string
+	{
+		return $this->connectionTable;
 	}
 
 	/**
 	 * SET IP CONNECTION TABLE
 	 *
-	 * @param string $sTableName
+	 * @param string $name
 	 * @return $this
 	 */
-	public function setIpConnectionTable($sTableName) {
-		$this->_sIpConnectionTable = (string) $sTableName;
+	public function setIpConnectionTable(string $name): Config
+	{
+		$this->ipConnectionTable = $name;
 		return $this;
 	}
 
-	/** @return string */
-	public function getIpConnectionTable() {
-		return $this->_sIpConnectionTable;
+	/**
+	 * @return string
+	 */
+	public function getIpConnectionTable(): string
+	{
+		return $this->ipConnectionTable;
 	}
 
 	/**
 	 * SET USER SESSION PATH
 	 *
-	 * @param string $sPath
+	 * @param string $path
 	 * @return $this
 	 */
-	public function setUserSessionPath($sPath) {
-		$this->_sUserSessionPath = (string) $sPath;
+	public function setUserSessionPath(string $path): Config
+	{
+		$this->userSessionPath = $path;
 		return $this;
 	}
 
-	/** @return string */
-	public function getUserSessionPath() {
-		return $this->_sUserSessionPath;
+	/**
+	 * @return string
+	 */
+	public function getUserSessionPath(): string
+	{
+		return $this->userSessionPath;
 	}
 
 	/**
 	 * SET REDIRECT SESSION PATH
 	 *
-	 * @param string $sPath
+	 * @param string $path
 	 * @return $this
 	 */
-	public function setRedirectSessionPath($sPath) {
-		$this->_sRedirectSessionPath = (string) $sPath;
+	public function setRedirectSessionPath(string $path): Config
+	{
+		$this->redirectSessionPath = $path;
 		return $this;
 	}
 
-	/** @return string */
-	public function getRedirectSessionPath() {
-		return $this->_sRedirectSessionPath;
+	/**
+	 * @return string
+	 */
+	public function getRedirectSessionPath(): string
+	{
+		return $this->redirectSessionPath;
 	}
 
 	/**
 	 * SET SESSION MAX LIFE TIME
 	 *
-	 * @param int $iSeconds
+	 * @param int $seconds
 	 * @return $this
 	 */
-	public function setSessionMaxLifeTime($iSeconds) {
-		$this->_iSessionMaxLifeTime = (int) $iSeconds;
+	public function setSessionMaxLifeTime(int $seconds): Config
+	{
+		$this->sessionMaxLifeTime = $seconds;
 		return $this;
 	}
 
-	/** @return int */
-	public function getSessionMaxLifeTime() {
-		return $this->_iSessionMaxLifeTime;
+	/**
+	 * @return int
+	 */
+	public function getSessionMaxLifeTime(): int
+	{
+		return $this->sessionMaxLifeTime;
 	}
-
 }
