@@ -11,7 +11,7 @@ use Exception;
  * @link		https://github.com/Coercive/Session
  *
  * @author  	Anthony Moral <contact@coercive.fr>
- * @copyright   2018 Anthony Moral
+ * @copyright   2019 Anthony Moral
  * @license 	MIT
  */
 class Session
@@ -33,7 +33,7 @@ class Session
 	 *
 	 * @return bool
 	 */
-	private function _isValidId(): bool
+	private function isValidId(): bool
 	{
 		return preg_match('/^[-,a-zA-Z0-9]{1,128}$/', session_id()) > 0;
 	}
@@ -41,62 +41,58 @@ class Session
 	/**
 	 * Session constructor.
 	 *
-	 * @param Config $conf [optional]
+	 * @return void
 	 * @throws Exception
 	 */
-	public function __construct(Config $conf = null)
+	public function __construct(Config $conf)
 	{
-		# Autoload Config with default values
-		if(null === $conf) { $conf = new Config; }
-		$this->config = $conf;
-
 		# Ini set custom session domain
-		if($sSessionDomain = $conf->getSessionDomain()) {
-			$this->setSessionDomain($sSessionDomain);
+		if(null !== ($sessionDomain = $conf->getSessionDomain())) {
+			$this->setSessionDomain($sessionDomain);
 		}
 
 		# Ini set custom cookie domain
-		if($sCookieDomain = $conf->getCookieDomain()) {
-			$this->setCookieDomain($sCookieDomain);
+		if(null !== ($cookieDomain = $conf->getCookieDomain())) {
+			$this->setCookieDomain($cookieDomain);
 		}
 
 		# Ini set custom session path
-		if($sSessionPath = $conf->getSessionPath()) {
-			$this->setSessionPath($sSessionPath);
+		if(null !== ($sessionPath = $conf->getSessionPath())) {
+			$this->setSessionPath($sessionPath);
 		}
 
 		# Ini set custom session name
-		if($sSessionName = $conf->getSessionName()) {
-			$this->setSessionName($sSessionName);
+		if(null !== ($sessionName = $conf->getSessionName())) {
+			$this->setSessionName($sessionName);
 		}
 
 		# Ini set session max life time
-		if($iSessionMaxTime = $conf->getSessionMaxLifeTime()) {
-			$this->setSessionMaxLifeTime($iSessionMaxTime);
+		if(null !== ($sessionMaxTime = $conf->getSessionMaxLifeTime())) {
+			$this->setSessionMaxLifeTime($sessionMaxTime);
 		}
 
 		# Ini set cookie life time
-		if($iCookieLifeTime = $conf->getCookieLifeTime()) {
-			$this->setCookieLifeTime($iCookieLifeTime);
+		if(null !== ($cookieLifeTime = $conf->getCookieLifeTime())) {
+			$this->setCookieLifeTime($cookieLifeTime);
 		}
 
 		# Ini set cookie path
-		if($sCookiePath = $conf->getCookiePath()) {
-			$this->setCookiePath($sCookiePath);
+		if(null !== ($cookiePath = $conf->getCookiePath())) {
+			$this->setCookiePath($cookiePath);
 		}
 
 		# Ini set cookie secure
-		if($bCookieSecure = $conf->getCookieSecure()) {
-			$this->setCookieSecure($bCookieSecure);
+		if(null !== ($cookieSecure = $conf->getCookieSecure())) {
+			$this->setCookieSecure($cookieSecure);
 		}
 
 		# Ini set cookie httponly
-		if($bCookieHttpOnly = $conf->getCookieHttpOnly()) {
-			$this->setCookieHttpOnly($bCookieHttpOnly);
+		if(null !== ($cookieHttpOnly = $conf->getCookieHttpOnly())) {
+			$this->setCookieHttpOnly($cookieHttpOnly);
 		}
 
 		# Start session with verification
-		if ($conf->isAutoStartSession()) {
+		if($conf->isAutoStartSession()) {
 			$this->startSession();
 		}
 
@@ -147,7 +143,7 @@ class Session
 	 */
 	public function isActive(): bool
 	{
-		return session_status() === PHP_SESSION_ACTIVE && session_id() !== '' && $this->_isValidId();
+		return session_status() === PHP_SESSION_ACTIVE && session_id() !== '' && $this->isValidId();
 	}
 
 	/**
@@ -300,7 +296,7 @@ class Session
 	 */
 	public function getSessionId(): string
 	{
-		return $this->isActive() ? session_id() : null;
+		return $this->isActive() ? session_id() : '';
 	}
 
 	/**
