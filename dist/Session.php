@@ -41,6 +41,7 @@ class Session
 	/**
 	 * Session constructor.
 	 *
+	 * @param Config $conf
 	 * @return void
 	 * @throws Exception
 	 */
@@ -48,73 +49,13 @@ class Session
 	{
 		$this->config = $conf;
 
-		# Ini set custom session domain
-		if(null !== ($sessionDomain = $conf->getSessionDomain())) {
-			$this->setSessionDomain($sessionDomain);
-		}
-
-		# Ini set custom cookie domain
-		if(null !== ($cookieDomain = $conf->getCookieDomain())) {
-			$this->setCookieDomain($cookieDomain);
-		}
-
-		# Ini set custom session path
-		if(null !== ($sessionPath = $conf->getSessionPath())) {
-			$this->setSessionPath($sessionPath);
-		}
-
-		# Ini set custom session name
-		if(null !== ($sessionName = $conf->getSessionName())) {
-			$this->setSessionName($sessionName);
-		}
-
-		# Ini set session max life time
-		if(null !== ($sessionMaxTime = $conf->getSessionMaxLifeTime())) {
-			$this->setSessionMaxLifeTime($sessionMaxTime);
-		}
-
-		# Ini set cookie life time
-		if(null !== ($cookieLifeTime = $conf->getCookieLifeTime())) {
-			$this->setCookieLifeTime($cookieLifeTime);
-		}
-
-		# Ini set cookie path
-		if(null !== ($cookiePath = $conf->getCookiePath())) {
-			$this->setCookiePath($cookiePath);
-		}
-
-		# Ini set cookie secure
-		if(null !== ($cookieSecure = $conf->getCookieSecure())) {
-			$this->setCookieSecure($cookieSecure);
-		}
-
-		# Ini set cookie httponly
-		if(null !== ($cookieHttpOnly = $conf->getCookieHttpOnly())) {
-			$this->setCookieHttpOnly($cookieHttpOnly);
-		}
-
-		# Ini set use strict mode
-		if(null !== ($useStrict = $conf->getUseStrictMode())) {
-			$this->setUseStrictMode($useStrict);
-		}
-
-		# Ini set gc probability
-		if(null !== ($gcProbability = $conf->getGcProbability())) {
-			$this->setGcProbability($gcProbability);
-		}
-
-		# Ini set gc divisor
-		if(null !== ($gcDivisor = $conf->getGcDivisor())) {
-			$this->setGcDivisor($gcDivisor);
-		}
-
 		# Start session with verification
 		if($conf->isAutoStartSession()) {
 			$this->startSession();
 		}
 
 		# TimeStamp
-		$this->date = $conf->getSessionDate();
+		$this->date = $conf->getDate();
 
 		# Redirect
 		$this->redirect = new Redirect($this);
@@ -171,10 +112,22 @@ class Session
 	 */
 	public function startSession(): Session
 	{
-		# Already
+		# Do not start if already active
 		if($this->isActive()) { return $this; }
 
-		# Start
+		# Prepare config ini set options
+		foreach ($this->config->getIni() as $name => $value)
+		{
+			if(is_bool($value)) {
+				$value = $value ? '1' : '0';
+			}
+			else {
+				$value = strval($value);
+			}
+			ini_set($name, $value);
+		}
+
+		# Start session
 		if(!@session_start()) {
 			session_destroy();
 			if(!session_start()) {
@@ -187,153 +140,9 @@ class Session
 	}
 
 	/**
-	 * SET SESSION DOMAIN
-	 *
-	 * @param string $domain
-	 * @return $this
-	 */
-	public function setSessionDomain(string $domain): Session
-	{
-		ini_set('session.session_domain', $domain);
-		return $this;
-	}
-
-	/**
-	 * SET COOKIE DOMAIN
-	 *
-	 * @param string $sCookieDomain
-	 * @return $this
-	 */
-	public function setCookieDomain(string $domain): Session
-	{
-		ini_set('session.cookie_domain', $domain);
-		return $this;
-	}
-
-	/**
-	 * SET SESSION PATH
-	 *
-	 * @param string $sSessionPath
-	 * @return $this
-	 */
-	public function setSessionPath(string $path): Session
-	{
-		ini_set('session.save_path', $path);
-		return $this;
-	}
-
-	/**
-	 * SET COOKIE PATH
-	 *
-	 * @param string $path
-	 * @return $this
-	 */
-	public function setCookiePath(string $path): Session
-	{
-		ini_set('session.cookie_path', $path);
-		return $this;
-	}
-
-	/**
-	 * SET SESSION COOKIE LIFE TIME
-	 *
-	 * @param int $seconds
-	 * @return $this
-	 */
-	public function setCookieLifeTime(int $seconds): Session
-	{
-		ini_set('session.cookie_lifetime', $seconds);
-		return $this;
-	}
-
-	/**
-	 * SET SESSION COOKIE SECURE
-	 *
-	 * @param bool $state
-	 * @return $this
-	 */
-	public function setCookieSecure(bool $state): Session
-	{
-		ini_set('session.cookie_secure', $state);
-		return $this;
-	}
-
-	/**
-	 * SET SESSION COOKIE HTTP ONLY
-	 *
-	 * @param bool $state
-	 * @return $this
-	 */
-	public function setCookieHttpOnly(bool $state): Session
-	{
-		ini_set('session.cookie_httponly', $state);
-		return $this;
-	}
-
-	/**
-	 * SET SESSION USE STRICT MODE
-	 *
-	 * @param bool $state
-	 * @return $this
-	 */
-	public function setUseStrictMode(bool $state): Session
-	{
-		ini_set('session.use_strict_mode', $state);
-		return $this;
-	}
-
-	/**
-	 * SET SESSION MAX LIFE TIME
-	 *
-	 * @param int $seconds
-	 * @return $this
-	 */
-	public function setSessionMaxLifeTime(int $seconds): Session
-	{
-		ini_set('session.gc_maxlifetime', $seconds);
-		return $this;
-	}
-
-	/**
-	 * SET SESSION GARBAGE COLLECTOR PROBABILITY
-	 *
-	 * @param int $percent
-	 * @return $this
-	 */
-	public function setGcProbability(int $percent): Session
-	{
-		ini_set('session.gc_probability', $percent);
-		return $this;
-	}
-
-	/**
-	 * SET SESSION GARBAGE COLLECTOR DIVISOR
-	 *
-	 * @param int $percent
-	 * @return $this
-	 */
-	public function setGcDivisor(int $percent): Session
-	{
-		ini_set('session.gc_divisor', $percent);
-		return $this;
-	}
-
-	/**
-	 * SET SESSION NAME
-	 *
-	 * @param string $sSessionName
-	 * @return $this
-	 */
-	public function setSessionName(string $name): Session
-	{
-		ini_set('session.session_name', $name);
-		return $this;
-	}
-
-	/**
 	 * SET SESSION DATE
 	 *
-	 * @param DateTime $oDate
+	 * @param DateTime $date
 	 * @return $this
 	 */
 	public function setSessionDate(DateTime $date): Session
