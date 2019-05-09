@@ -8,46 +8,13 @@ use DateTime;
  */
 class Config
 {
-	# INIT SET
+	# Ini set
 
-	/** @var string Init session domain */
-	private $sessionDomain = null;
-
-	/** @var string Init cookie domain */
-	private $cookieDomain = null;
-
-	/** @var string Init cookie path */
-	private $cookiePath = null;
-
-	/** @var string Init session path */
-	private $sessionPath = null;
-
-	/** @var string Init session name */
-	private $sessionName = null;
+	/** @var array List of session ini set */
+	private $ini = [];
 
 	/** @var DateTime Init session date */
-	private $sessionDate = null;
-
-	/** @var bool Init Cookie Secure */
-	private $cookieSecure = false;
-
-	/** @var bool Init Cookie Http Only */
-	private $cookieHttpOnly = false;
-
-	/** @var int Init Session Max Life Time */
-	private $sessionMaxLifeTime = null;
-
-	/** @var int Init Cookie Life Time */
-	private $cookieLifeTime = null;
-
-	/** @var int Init GC Probability */
-	private $gcProbability = null;
-
-	/** @var int Init GC Divisor */
-	private $gcDivisor = null;
-
-	/** @var bool Init Use Strict Mode */
-	private $useStrictMode = null;
+	private $date = null;
 
 	# Options
 
@@ -76,292 +43,500 @@ class Config
 	 */
 	public function __construct()
 	{
-		$this->sessionDate = new DateTime;
+		$this->date = new DateTime;
+	}
+
+	/**
+	 * Options for iniset
+	 *
+	 * @return array
+	 */
+	public function getIni()
+	{
+		return $this->ini;
 	}
 
 # INIT ####################################################################################################################################
 
 	/**
-	 * SESSION DOMAIN
+	 * Session save handler
 	 *
-	 * Ini set session domain
+	 * @param string $handler
+	 * @return $this
+	 */
+	public function setSaveHandler(string $handler): Config
+	{
+		$this->ini['session.save_handler'] = $handler;
+		return $this;
+	}
+
+	/**
+	 * Session save path
 	 *
 	 * @param string $domain
 	 * @return $this
 	 */
-	public function setSessionDomain(string $domain): Config
+	public function setSavePath(string $domain): Config
 	{
-		$this->sessionDomain = $domain;
+		$this->ini['session.save_path'] = $domain;
 		return $this;
 	}
 
 	/**
-	 * @return string|null
-	 */
-	public function getSessionDomain()
-	{
-		return $this->sessionDomain;
-	}
-
-	/**
-	 * COOKIE DOMAIN
-	 *
-	 * Ini set cookie domain
-	 *
-	 * @param string $domain
-	 * @return $this
-	 */
-	public function setCookieDomain(string $domain): Config
-	{
-		$this->cookieDomain = $domain;
-		return $this;
-	}
-
-	/**
-	 * @return string|null
-	 */
-	public function getCookieDomain()
-	{
-		return $this->cookieDomain;
-	}
-
-	/**
-	 * COOKIE DOMAIN
-	 *
-	 * Ini set cookie path
-	 *
-	 * @param string $path
-	 * @return $this
-	 */
-	public function setCookiePath(string $path): Config
-	{
-		$this->cookiePath = $path;
-		return $this;
-	}
-
-	/**
-	 * @return string|null
-	 */
-	public function getCookiePath()
-	{
-		return $this->cookiePath;
-	}
-
-	/**
-	 * SET COOKIE LIFE TIME
-	 *
-	 * Ini set cookie life time
-	 *
-	 * @param int $seconds
-	 * @return $this
-	 */
-	public function setCookieLifeTime(int $seconds): Config
-	{
-		$this->cookieLifeTime = $seconds;
-		return $this;
-	}
-
-	/**
-	 * @return int|null
-	 */
-	public function getCookieLifeTime()
-	{
-		return $this->cookieLifeTime;
-	}
-
-	/**
-	 * SET COOKIE SECURE
-	 *
-	 * Ini set cookie secure
-	 *
-	 * @param bool $state
-	 * @return $this
-	 */
-	public function setCookieSecure(bool $state): Config
-	{
-		$this->cookieSecure = $state;
-		return $this;
-	}
-
-	/**
-	 * @return bool|null
-	 */
-	public function getCookieSecure()
-	{
-		return $this->cookieSecure;
-	}
-
-	/**
-	 * SET COOKIE HTTP ONLY
-	 *
-	 * Ini set cookie httponly
-	 *
-	 * @param bool $state
-	 * @return $this
-	 */
-	public function setCookieHttpOnly(bool $state): Config
-	{
-		$this->cookieHttpOnly = $state;
-		return $this;
-	}
-
-	/**
-	 * @return bool|null
-	 */
-	public function getCookieHttpOnly()
-	{
-		return $this->cookieHttpOnly;
-	}
-
-	/**
-	 * SET USE STRICT MODE
-	 *
-	 * Ini set use strict mode
-	 *
-	 * @param bool $state
-	 * @return $this
-	 */
-	public function setUseStrictMode(bool $state): Config
-	{
-		$this->useStrictMode = $state;
-		return $this;
-	}
-
-	/**
-	 * @return bool|null
-	 */
-	public function getUseStrictMode()
-	{
-		return $this->useStrictMode;
-	}
-
-	/**
-	 * SESSION PATH
-	 *
-	 * Ini set session save path
-	 *
-	 * @param string $path
-	 * @return $this
-	 */
-	public function setSessionPath(string $path): Config
-	{
-		$this->sessionPath = $path;
-		return $this;
-	}
-
-	/**
-	 * @return string|null
-	 */
-	public function getSessionPath()
-	{
-		return $this->sessionPath;
-	}
-
-	/**
-	 * SESSION NAME
-	 *
-	 * Ini set session name
+	 * Session name
 	 *
 	 * @param string $name
 	 * @return $this
 	 */
-	public function setSessionName(string $name): Config
+	public function setName(string $name): Config
 	{
-		$this->sessionName = $name;
+		$this->ini['session.name'] = $name;
 		return $this;
 	}
 
 	/**
-	 * @return string|null
-	 */
-	public function getSessionName()
-	{
-		return $this->sessionName;
-	}
-
-	/**
-	 * SESSION DATE
+	 * Session auto start
 	 *
-	 * Ini set session date
-	 *
-	 * @param DateTime $date
+	 * @param bool $state
 	 * @return $this
 	 */
-	public function setSessionDate(DateTime $date): Config
+	public function setAutoStart(bool $state): Config
 	{
-		$this->sessionDate = $date;
+		$this->ini['session.auto_start'] = $state;
 		return $this;
 	}
 
 	/**
-	 * @return DateTime
-	 */
-	public function getSessionDate(): DateTime
-	{
-		return $this->sessionDate;
-	}
-
-	/**
-	 * SET SESSION MAX LIFE TIME
+	 * Session serialize handler
 	 *
-	 * @param int $seconds
+	 * @param string $handler
 	 * @return $this
 	 */
-	public function setSessionMaxLifeTime(int $seconds): Config
+	public function setSerializeHandler(string $handler): Config
 	{
-		$this->sessionMaxLifeTime = $seconds;
+		$this->ini['session.serialize_handler'] = $handler;
 		return $this;
 	}
 
 	/**
-	 * @return int|null
-	 */
-	public function getSessionMaxLifeTime()
-	{
-		return $this->sessionMaxLifeTime;
-	}
-
-	/**
-	 * SET GC PROBABILITY
+	 * Session gc probability
 	 *
 	 * @param int $percent
 	 * @return $this
 	 */
 	public function setGcProbability(int $percent): Config
 	{
-		$this->gcProbability = $percent;
+		$this->ini['session.gc_probability'] = $percent;
 		return $this;
 	}
 
 	/**
-	 * @return int|null
-	 */
-	public function getGcProbability()
-	{
-		return $this->gcProbability;
-	}
-
-	/**
-	 * SET GC PROBABILITY
+	 * Session gc divisor
 	 *
 	 * @param int $percent
 	 * @return $this
 	 */
 	public function setGcDivisor(int $percent): Config
 	{
-		$this->gcDivisor = $percent;
+		$this->ini['session.gc_divisor'] = $percent;
 		return $this;
 	}
 
 	/**
-	 * @return int|null
+	 * Session gc max life time
+	 *
+	 * @param int $seconds
+	 * @return $this
 	 */
-	public function getGcDivisor()
+	public function setGcMaxlifetime(int $seconds): Config
 	{
-		return $this->gcDivisor;
+		$this->ini['session.gc_maxlifetime'] = $seconds;
+		return $this;
+	}
+
+	/**
+	 * Session referer check
+	 *
+	 * @param string $url
+	 * @return $this
+	 */
+	public function setRefererCheck(string $url): Config
+	{
+		$this->ini['session.referer_check'] = $url;
+		return $this;
+	}
+
+	/**
+	 * Session entropy file
+	 *
+	 * @param string $path
+	 * @return $this
+	 */
+	public function setEntropyFile(string $path): Config
+	{
+		$this->ini['session.entropy_file'] = $path;
+		return $this;
+	}
+
+	/**
+	 * Session entropy length
+	 *
+	 * @param int $bytes
+	 * @return $this
+	 */
+	public function setEntropyLength(int $bytes): Config
+	{
+		$this->ini['session.entropy_length'] = $bytes;
+		return $this;
+	}
+
+	/**
+	 * Session use strict mode
+	 *
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setUseStrictMode(bool $state): Config
+	{
+		$this->ini['session.use_strict_mode'] = $state;
+		return $this;
+	}
+
+	/**
+	 * Session use cookies
+	 *
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setUseCookies(bool $state): Config
+	{
+		$this->ini['session.use_cookies'] = $state;
+		return $this;
+	}
+
+	/**
+	 * Session use only cookies
+	 *
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setUseOnlyCookies(bool $state): Config
+	{
+		$this->ini['session.use_only_cookies'] = $state;
+		return $this;
+	}
+
+	/**
+	 * Session cookie lifetime
+	 *
+	 * @param int $seconds
+	 * @return $this
+	 */
+	public function setCookieLifetime (int $seconds): Config
+	{
+		$this->ini['session.cookie_lifetime'] = $seconds;
+		return $this;
+	}
+
+	/**
+	 * Session cookie path
+	 *
+	 * @param string $path
+	 * @return $this
+	 */
+	public function setCookiePath(string $path): Config
+	{
+		$this->ini['session.cookie_path'] = $path;
+		return $this;
+	}
+
+	/**
+	 * Session cookie domain
+	 *
+	 * @param string $domain
+	 * @return $this
+	 */
+	public function setCookieDomain(string $domain): Config
+	{
+		$this->ini['session.cookie_domain'] = $domain;
+		return $this;
+	}
+
+	/**
+	 * Session cookie secure
+	 *
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setCookieSecure(bool $state): Config
+	{
+		$this->ini['session.cookie_secure'] = $state;
+		return $this;
+	}
+
+	/**
+	 * Session cookie httponly
+	 *
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setCookieHttponly(bool $state): Config
+	{
+		$this->ini['session.cookie_httponly'] = $state;
+		return $this;
+	}
+
+	/**
+	 * Session cookie samesite
+	 *
+	 * @param string $site
+	 * @return $this
+	 */
+	public function setCookieSamesite(string $site): Config
+	{
+		$this->ini['session.cookie_samesite'] = $site;
+		return $this;
+	}
+
+	/**
+	 * Session cache limiter
+	 *
+	 * @param string $method
+	 * @return $this
+	 */
+	public function setCacheLimiter(string $method): Config
+	{
+		$this->ini['session.cache_limiter'] = $method;
+		return $this;
+	}
+
+	/**
+	 * Session cache expire
+	 *
+	 * @param int $minutes
+	 * @return $this
+	 */
+	public function setCacheExpire(int $minutes): Config
+	{
+		$this->ini['session.cache_expire'] = $minutes;
+		return $this;
+	}
+
+	/**
+	 * Session use trans sid
+	 *
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setUseTransSid(bool $state): Config
+	{
+		$this->ini['session.use_trans_sid'] = $state;
+		return $this;
+	}
+
+	/**
+	 * Session use trans sid
+	 *
+	 * @param string $tags
+	 * @return $this
+	 */
+	public function setTransSidTags(string $tags): Config
+	{
+		$this->ini['session.trans_sid_tags'] = $tags;
+		return $this;
+	}
+
+	/**
+	 * Session trans sid hosts
+	 *
+	 * @param string $hosts
+	 * @return $this
+	 */
+	public function setTransSidHosts(string $hosts): Config
+	{
+		$this->ini['session.trans_sid_hosts'] = $hosts;
+		return $this;
+	}
+
+	/**
+	 * Session bug compat 42
+	 *
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setBugCompat42(bool $state): Config
+	{
+		$this->ini['session.bug_compat_42'] = $state;
+		return $this;
+	}
+
+	/**
+	 * Session bug compat warn
+	 *
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setBugCompatWarn(bool $state): Config
+	{
+		$this->ini['session.bug_compat_warn'] = $state;
+		return $this;
+	}
+
+	/**
+	 * Session sid length
+	 *
+	 * @param int $length
+	 * @return $this
+	 */
+	public function setSidLength(int $length): Config
+	{
+		$this->ini['session.sid_length'] = $length;
+		return $this;
+	}
+
+	/**
+	 * Session sid bits per character
+	 *
+	 * @param int $length
+	 * @return $this
+	 */
+	public function setSidBitsPerCharacter(int $length): Config
+	{
+		$this->ini['session.sid_bits_per_character'] = $length;
+		return $this;
+	}
+
+	/**
+	 * Session hash function
+	 *
+	 * @param string $algorithm
+	 * @return $this
+	 */
+	public function setHashFunction(string $algorithm): Config
+	{
+		$this->ini['session.hash_function'] = $algorithm;
+		return $this;
+	}
+
+	/**
+	 * Session hash bits per character
+	 *
+	 * @param int $bits
+	 * @return $this
+	 */
+	public function setHashBitsPerCharacter (int $bits): Config
+	{
+		$this->ini['session.hash_bits_per_character'] = $bits;
+		return $this;
+	}
+
+	/**
+	 * Session upload progress enabled
+	 *
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setUploadProgressEnabled(bool $state): Config
+	{
+		$this->ini['session.upload_progress.enabled'] = $state;
+		return $this;
+	}
+
+	/**
+	 * Session upload progress cleanup
+	 *
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setUploadProgressCleanup(bool $state): Config
+	{
+		$this->ini['session.upload_progress.cleanup'] = $state;
+		return $this;
+	}
+
+	/**
+	 * Session upload progress prefix
+	 *
+	 * @param string $prefix
+	 * @return $this
+	 */
+	public function setUploadProgressPrefix(string $prefix): Config
+	{
+		$this->ini['session.upload_progress.prefix'] = $prefix;
+		return $this;
+	}
+
+	/**
+	 * Session upload progress name
+	 *
+	 * @param string $name
+	 * @return $this
+	 */
+	public function setUploadProgressName(string $name): Config
+	{
+		$this->ini['session.upload_progress.name'] = $name;
+		return $this;
+	}
+
+	/**
+	 * Session upload progress freq
+	 *
+	 * @param string $freq
+	 * @return $this
+	 */
+	public function setUploadProgressFreq(string $freq): Config
+	{
+		$this->ini['session.upload_progress.freq'] = $freq;
+		return $this;
+	}
+
+	/**
+	 * Session upload progress min_freq
+	 *
+	 * @param int $seconds
+	 * @return $this
+	 */
+	public function setUploadProgressMinFreq(int $seconds): Config
+	{
+		$this->ini['session.upload_progress.min_freq'] = $seconds;
+		return $this;
+	}
+
+	/**
+	 * Session lazy write
+	 *
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setLazyWrite(bool $state): Config
+	{
+		$this->ini['session.lazy_write'] = $state;
+		return $this;
 	}
 
 # OPTIONS #################################################################################################################################
+
+	/**
+	 * DATE
+	 *
+	 * @param DateTime $date
+	 * @return $this
+	 */
+	public function setDate(DateTime $date): Config
+	{
+		$this->date = $date;
+		return $this;
+	}
+
+	/**
+	 * DATE
+	 *
+	 * @return DateTime
+	 */
+	public function getDate(): DateTime
+	{
+		return $this->date;
+	}
 
 	/**
 	 * AUTO START SESSION
