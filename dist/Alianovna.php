@@ -213,8 +213,9 @@ class Alianovna
 		}
 
 		if($this->session) {
-			if(is_file($this->session)) {
-				unlink($this->session);
+			$path = $this->sessionDir . DIRECTORY_SEPARATOR . $this->session;
+			if(is_file($path)) {
+				unlink($path);
 			}
 		}
 
