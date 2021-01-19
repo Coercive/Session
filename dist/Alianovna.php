@@ -39,6 +39,9 @@ class Alianovna
 	/** @var int Openssl random pseudo bytes length */
 	private $randomLength = self::DEFAULT_SSL_RANDOM_LENGTH;
 
+	/** @var bool Set registry keys in cookies */
+	private $useCookies = false;
+
 	/** @var int Cookie duration */
 	private $expire;
 
@@ -120,7 +123,7 @@ class Alianovna
 	 */
 	private function loadKeys(): bool
 	{
-		if(!$this->keys) {
+		if(!$this->keys && $this->useCookies) {
 			foreach (range(1, $this->nbKeys) as $k) {
 				$key = $this->prefixKeys . $k;
 				$registry = $this->cookie->getSafe($key);
@@ -128,10 +131,10 @@ class Alianovna
 					$this->keys[$key] = $registry;
 				}
 			}
-			if(count($this->keys) !== $this->nbKeys) {
-				$this->keys = [];
-				return false;
-			}
+		}
+		if(count($this->keys) !== $this->nbKeys) {
+			$this->keys = [];
+			return false;
 		}
 		return true;
 	}
@@ -205,7 +208,10 @@ class Alianovna
 			} while(true);
 			$this->keys[$key] = $registry;
 			$written = $this->write($path, $datas[$k]);
-			$cooked = $this->cookie->setSafe($key, $registry, time() + $this->expire);
+			$cooked = true;
+			if($this->useCookies) {
+				$cooked = $this->cookie->setSafe($key, $registry, time() + $this->expire);
+			}
 			$status = $status && $written && $cooked;
 		}
 		return $status;
@@ -222,17 +228,21 @@ class Alianovna
 		foreach (range(1, $this->nbKeys) as $k) {
 			$key = $this->prefixKeys . $k;
 			$registry = $this->keys[$key] ?? '';
-			if(!$registry) {
+			if(!$registry && $this->useCookies) {
 				$registry = $this->cookie->getSafe($key);
 			}
-			$path = $this->registryDir . DIRECTORY_SEPARATOR . $registry;
-			if(!$this->session && is_file($path) && $chunk = file_get_contents($path)) {
-				$session .= $chunk;
+			if($registry) {
+				$path = $this->registryDir . DIRECTORY_SEPARATOR . $registry;
+				if(!$this->session && is_file($path) && $chunk = file_get_contents($path)) {
+					$session .= $chunk;
+				}
+				if(is_file($path)) {
+					unlink($path);
+				}
 			}
-			if(is_file($path)) {
-				unlink($path);
+			if($this->useCookies) {
+				$this->cookie->delete($this->prefixKeys . $k);
 			}
-			$this->cookie->delete($this->prefixKeys . $k);
 		}
 		$decrypted = $this->decrypt($session, $this->crypt);
 		$data = $decrypted ? json_decode($decrypted) : null;
@@ -332,10 +342,10 @@ class Alianovna
 	 *
 	 * @param string $crypt
 	 * @param string $directory
-	 * @param Cookie $cookie
+	 * @param Cookie $cookie [optional]
 	 * @return void
 	 */
-	public function __construct(string $crypt, string $directory, Cookie $cookie)
+	public function __construct(string $crypt, string $directory, Cookie $cookie = null)
 	{
 		$this->crypt = $crypt;
 
@@ -343,7 +353,10 @@ class Alianovna
 		$this->registryDir = $directory . DIRECTORY_SEPARATOR . self::REGISTRY;
 		$this->sessionDir = $directory . DIRECTORY_SEPARATOR . self::SESSION;
 
-		$this->cookie = $cookie;
+		if($cookie) {
+			$this->cookie = $cookie;
+			$this->useCookies = true;
+		}
 
 		$this->expire = 365 * 24 * 60 * 60;
 	}
@@ -357,6 +370,22 @@ class Alianovna
 	public function expire(int $seconds): Alianovna
 	{
 		$this->expire = $seconds;
+		return $this;
+	}
+
+	/**
+	 * Set/unset registry keys in cookies
+	 *
+	 * @param bool $status [optional]
+	 * @param Cookie $cookie [optional]
+	 * @return $this
+	 */
+	public function cookie(bool $status = false, Cookie $cookie = null): Alianovna
+	{
+		if($cookie) {
+			$this->cookie = $cookie;
+		}
+		$this->useCookies = $status && $this->cookie;
 		return $this;
 	}
 
@@ -400,6 +429,32 @@ class Alianovna
 			$this->prefixKeys = $name;
 		}
 		return $this;
+	}
+
+	/**
+	 * Expose/Inject registry keys
+	 *
+	 * @param array|null $keys
+	 * @return array|string[]
+	 */
+	public function keys(array $keys = null): array
+	{
+		if(null === $keys) {
+			return $this->keys;
+		}
+		if($keys) {
+			foreach (range(1, $keys) as $k) {
+				$key = $this->prefixKeys . $k;
+				if($registry = $keys[$key] ?? '') {
+					$this->keys[$key] = $registry;
+				}
+			}
+			if(count($this->keys) !== $this->nbKeys) {
+				$this->keys = [];
+				return [];
+			}
+		}
+		return [];
 	}
 
 	/**
@@ -501,23 +556,6 @@ class Alianovna
 	}
 
 	/**
-	 * Destroy an existing customer session
-	 *
-	 * @return $this
-	 */
-	public function destroy(): Alianovna
-	{
-		$sessions = $this->deleteRegistryFiles();
-		$this->deleteSessionFile($sessions);
-
-		$this->keys = [];
-		$this->session = null;
-		$this->secret = null;
-		$this->data = null;
-		return $this;
-	}
-
-	/**
 	 * Save data in current session.
 	 *
 	 * @param array $overwrite []
@@ -614,6 +652,23 @@ class Alianovna
 				}
 			}
 		}
+		return $this;
+	}
+
+	/**
+	 * Destroy an existing customer session
+	 *
+	 * @return $this
+	 */
+	public function destroy(): Alianovna
+	{
+		$sessions = $this->deleteRegistryFiles();
+		$this->deleteSessionFile($sessions);
+
+		$this->keys = [];
+		$this->session = null;
+		$this->secret = null;
+		$this->data = null;
 		return $this;
 	}
 
