@@ -92,6 +92,28 @@ $alianovna->save();
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+# If you do not use cookie, you can store registry keys elsewhere
+
+# First, disable cookie
+$alianovna = new Alianovna($crypt, $dir /* not insert Cookie class here */);
+# OR
+$alianovna->cookie(false);
+
+# Inject external registry keys
+$keys = [
+    'TEST_KEY_1' => 'xxxxxxxxxx',
+    'TEST_KEY_2' => 'yyyyyyyyyy',
+    'TEST_KEY_3' => 'zzzzzzzzzz'
+];
+
+$alianovna->prefixKeys('TEST_KEY_');
+$alianovna->keys($keys);
+
+# Expose internal registry keys
+$keys = $alianovna->keys();
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 # Refresh regstry tokens and cookies
 $alianovna->refresh();
 
