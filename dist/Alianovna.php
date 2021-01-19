@@ -28,10 +28,13 @@ class Alianovna
 
 	const DEFAULT_SSL_RANDOM_LENGTH = 128;
 	const DEFAULT_KEYS_NB = 3;
-	const KEYS_NAME = 'ALIANOVNA_KEY_';
+	const DEFAULT_PREFIX_KEYS = 'ALIANOVNA_KEY_';
 
 	/** @var int Number of keys / cookies required for bind and open session */
 	private $nbKeys = self::DEFAULT_KEYS_NB;
+
+	/** @var int Name (prefix) of keys / cookies required for bind and open session */
+	private $prefixKeys = self::DEFAULT_PREFIX_KEYS;
 
 	/** @var int Openssl random pseudo bytes length */
 	private $randomLength = self::DEFAULT_SSL_RANDOM_LENGTH;
@@ -119,7 +122,7 @@ class Alianovna
 	{
 		if(!$this->keys) {
 			foreach (range(1, $this->nbKeys) as $k) {
-				$key = self::KEYS_NAME . $k;
+				$key = $this->prefixKeys . $k;
 				$registry = $this->cookie->getSafe($key);
 				if($registry) {
 					$this->keys[$key] = $registry;
@@ -192,7 +195,7 @@ class Alianovna
 
 		$status = true;
 		foreach ($range as $k) {
-			$key = self::KEYS_NAME . $k;
+			$key = $this->prefixKeys . $k;
 			do {
 				$registry = $this->token();
 				$path = $this->registryDir . DIRECTORY_SEPARATOR . $registry;
@@ -217,7 +220,7 @@ class Alianovna
 	{
 		$session = '';
 		foreach (range(1, $this->nbKeys) as $k) {
-			$key = self::KEYS_NAME . $k;
+			$key = $this->prefixKeys . $k;
 			$registry = $this->keys[$key] ?? '';
 			if(!$registry) {
 				$registry = $this->cookie->getSafe($key);
@@ -229,7 +232,7 @@ class Alianovna
 			if(is_file($path)) {
 				unlink($path);
 			}
-			$this->cookie->delete(self::KEYS_NAME . $k);
+			$this->cookie->delete($this->prefixKeys . $k);
 		}
 		$decrypted = $this->decrypt($session, $this->crypt);
 		$data = $decrypted ? json_decode($decrypted) : null;
@@ -381,6 +384,20 @@ class Alianovna
 	{
 		if($nb >= 1) {
 			$this->nbKeys = $nb;
+		}
+		return $this;
+	}
+
+	/**
+	 * Name (prefix) of keys / cookies required for bind and open session
+	 *
+	 * @param string $name [optional]
+	 * @return $this
+	 */
+	public function prefixKeys(string $name = self::DEFAULT_PREFIX_KEYS): Alianovna
+	{
+		if($name) {
+			$this->prefixKeys = $name;
 		}
 		return $this;
 	}
