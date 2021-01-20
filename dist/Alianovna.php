@@ -443,7 +443,7 @@ class Alianovna
 			return $this->keys;
 		}
 		if($keys) {
-			foreach (range(1, $keys) as $k) {
+			foreach (range(1, $this->nbKeys) as $k) {
 				$key = $this->prefixKeys . $k;
 				if($registry = $keys[$key] ?? '') {
 					$this->keys[$key] = $registry;
@@ -453,6 +453,7 @@ class Alianovna
 				$this->keys = [];
 				return [];
 			}
+			return $this->keys;
 		}
 		return [];
 	}
