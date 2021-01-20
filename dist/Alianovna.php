@@ -151,7 +151,7 @@ class Alianovna
 			'session' => $this->session
 		]), $this->crypt);
 
-		$length = round(strlen($encrypted) / $this->nbKeys);
+		$length = ceil(strlen($encrypted) / $this->nbKeys);
 		$chunks = str_split($encrypted, $length);
 
 		array_unshift($chunks,'');
