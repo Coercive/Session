@@ -30,8 +30,13 @@ if($Session->isActive()) {
 }
 ```
 
-Alianovna
----------
+Alianovna Session
+=================
+
+Experimental project: encrypted sessions
+
+Usage
+-----
 ```php
 use Coercive\Security\Cookie\Cookie;
 use Coercive\Security\Session\Alianovna;
