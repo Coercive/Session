@@ -14,7 +14,7 @@
     "require": {
         "php": ">=7.0",
         "ext-openssl": "*",
-        "coercive/crypt": "^1.*",
+        "coercive/crypt": "^1",
         "paragonie/sodium_compat": "^1.14"
     },
     "autoload": {
