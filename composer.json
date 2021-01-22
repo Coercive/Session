@@ -14,7 +14,8 @@
     "require": {
         "php": ">=7.0",
         "ext-openssl": "*",
-        "ext-json": "*"
+        "coercive/crypt": "^1.*",
+        "paragonie/sodium_compat": "^1.14"
     },
     "autoload": {
         "psr-4": { "Coercive\\Security\\Session\\": "dist/" }

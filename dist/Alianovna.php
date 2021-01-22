@@ -2,8 +2,17 @@
 namespace Coercive\Security\Session;
 
 use Exception;
+use TypeError;
+use SodiumException;
 use Coercive\Security\Crypt\Crypt;
 use Coercive\Security\Cookie\Cookie;
+
+use function Sodium\crypto_box_keypair;
+use function Sodium\crypto_box_publickey;
+use function Sodium\crypto_box_secretkey;
+use function Sodium\crypto_box_seal;
+use function Sodium\crypto_box_seal_open;
+use function Sodium\crypto_box_keypair_from_secretkey_and_publickey;
 
 /**
  * Class Alianovna
@@ -21,14 +30,23 @@ use Coercive\Security\Cookie\Cookie;
  */
 class Alianovna
 {
-	const NAME = 'Alianovna';
+	const NAME = 'alianovna';
 	const TMP_PREFIX = 'tmp_alianovna_';
-	const REGISTRY = 'registry';
-	const SESSION = 'session';
+	const DIR_KEY = 'key';
+	const DIR_REGISTRY = 'registry';
+	const DIR_SESSION = 'session';
 
+	const HASH_ALGO = 'sha512';
 	const DEFAULT_SSL_RANDOM_LENGTH = 128;
 	const DEFAULT_KEYS_NB = 3;
 	const DEFAULT_PREFIX_KEYS = 'ALIANOVNA_KEY_';
+	const DEFAULT_EXPIRE = 365 * 24 * 60 * 60;
+
+	/** @var string Used as key password */
+	private $crypt;
+
+	/** @var string The current session name, used for main keys */
+	private $name = self::NAME;
 
 	/** @var int Number of keys / cookies required for bind and open session */
 	private $nbKeys = self::DEFAULT_KEYS_NB;
@@ -45,11 +63,11 @@ class Alianovna
 	/** @var int Cookie duration */
 	private $expire;
 
-	/** @var string The key for encrypt content */
-	private $crypt;
-
 	/** @var string The main directory */
 	private $mainDir;
+
+	/** @var string The registry directory */
+	private $keyDir;
 
 	/** @var string The registry directory */
 	private $registryDir;
@@ -60,14 +78,17 @@ class Alianovna
 	/** @var Cookie */
 	private $cookie;
 
+	/** @var string */
+	private $registryKp;
+
+	/** @var string */
+	private $sessionKp;
+
 	/** @var string[] */
 	private $keys = [];
 
 	/** @var string */
 	private $session = null;
-
-	/** @var string */
-	private $secret = null;
 
 	/** @var array */
 	private $data = null;
@@ -75,14 +96,13 @@ class Alianovna
 	/**
 	 * Alias encrypt
 	 *
-	 * @param string $text
-	 * @param string $crypt
+	 * @param string $str
 	 * @return string
 	 */
-	private function encrypt(string $text, string $crypt): string
+	private function encrypt(string $str): string
 	{
 		try {
-			return Crypt::encrypt($text, Crypt::createNewKey($crypt));
+			return Crypt::encrypt($str, Crypt::createNewKey($this->crypt));
 		}
 		catch (Exception $e) {
 			return '';
@@ -93,17 +113,106 @@ class Alianovna
 	 * Alias decrypt
 	 *
 	 * @param string $cipher
-	 * @param string $crypt
 	 * @return string
 	 */
-	private function decrypt(string $cipher, string $crypt)
+	private function decrypt(string $cipher)
 	{
 		try {
-			return Crypt::decrypt($cipher, Crypt::createNewKey($crypt));
+			return Crypt::decrypt($cipher, Crypt::createNewKey($this->crypt));
 		}
 		catch (Exception $e) {
 			return '';
 		}
+	}
+
+	/**
+	 * Seal the message (registry / session)
+	 *
+	 * @param string $box
+	 * @param string $kp
+	 * @return string
+	 */
+	private function seal(string $box, string $kp): string
+	{
+		if($box && $kp) {
+			try {
+				$pk = crypto_box_publickey($kp);
+				return (string) crypto_box_seal($box, $pk);
+			}
+			catch (SodiumException $e) {
+				return '';
+			}
+			catch (TypeError $e) {
+				return '';
+			}
+		}
+		return '';
+	}
+
+	/**
+	 * Unseal the message (registry / session)
+	 *
+	 * @param string $box
+	 * @param string $kp
+	 * @return string
+	 */
+	private function unseal(string $box, string $kp): string
+	{
+		if($box && $kp) {
+			try {
+				return (string) crypto_box_seal_open($box, $kp);
+			}
+			catch (SodiumException $e) {
+				return '';
+			}
+			catch (TypeError $e) {
+				return '';
+			}
+		}
+		return '';
+	}
+
+	/**
+	 * Prepare registry encrypted keypair
+	 *
+	 * @return bool
+	 * @throws Exception
+	 * @throws SodiumException
+	 */
+	private function initRegistryKeyPair(): bool
+	{
+		if($this->registryKp) {
+			return true;
+		}
+		$name = hash(self::HASH_ALGO, $this->name);
+		$private = $this->keyDir . DIRECTORY_SEPARATOR . $name . '.private';
+		$public = $this->keyDir . DIRECTORY_SEPARATOR . $name . '.public';
+		if(is_file($private) && is_file($public)) {
+			$skCiphered = file_get_contents($private);
+			$pkCiphered = file_get_contents($public);
+			if($skCiphered && $pkCiphered) {
+				$sk = $this->decrypt($skCiphered);
+				$pk = $this->decrypt($pkCiphered);
+				if($sk && $pk) {
+					$this->registryKp = crypto_box_keypair_from_secretkey_and_publickey($sk, $pk);
+				}
+			}
+		}
+		else {
+			$kp = crypto_box_keypair();
+			$sk = crypto_box_secretkey($kp);
+			$pk = crypto_box_publickey($kp);
+			$skCiphered = $this->encrypt($sk);
+			$pkCiphered = $this->encrypt($pk);
+			if($skCiphered && $pkCiphered) {
+				$skSaved = $this->write($private, $skCiphered);
+				$pkSaved = $this->write($public, $pkCiphered);
+				if($skSaved && $pkSaved) {
+					$this->registryKp = $kp;
+				}
+			}
+		}
+		return (bool) $this->registryKp;
 	}
 
 	/**
@@ -113,7 +222,7 @@ class Alianovna
 	 */
 	private function token(): string
 	{
-		return hash('sha512', openssl_random_pseudo_bytes($this->randomLength), false);
+		return hash(self::HASH_ALGO, openssl_random_pseudo_bytes($this->randomLength), false);
 	}
 
 	/**
@@ -143,13 +252,18 @@ class Alianovna
 	 * Create registry content
 	 *
 	 * @return array
+	 * @throws Exception
 	 */
 	private function createRegistryData(): array
 	{
-		$encrypted = $this->encrypt(json_encode([
-			'secret' => $this->secret,
-			'session' => $this->session
-		]), $this->crypt);
+		if(!$this->initRegistryKeyPair()) {
+			return [];
+		}
+
+		$encrypted = $this->seal(serialize([
+			'kp' => base64_encode($this->sessionKp),
+			'id' => $this->session
+		]), $this->registryKp);
 
 		$length = ceil(strlen($encrypted) / $this->nbKeys);
 		$chunks = str_split($encrypted, $length);
@@ -176,7 +290,7 @@ class Alianovna
 		} while(true);
 		$this->data = [];
 		$this->session = $session;
-		$this->secret = $this->token() . $this->crypt;
+		$this->sessionKp = crypto_box_keypair();
 		return $this->write($path, '');
 	}
 
@@ -192,7 +306,7 @@ class Alianovna
 		$datas = $this->createRegistryData();
 		$range = range(1, $this->nbKeys);
 		$keys = array_keys($datas);
-		if(count($range) !== count($keys) || array_diff($range, $keys)) {
+		if(!$datas || count($range) !== count($keys) || array_diff($range, $keys)) {
 			return false;
 		}
 
@@ -244,9 +358,12 @@ class Alianovna
 				$this->cookie->delete($this->prefixKeys . $k);
 			}
 		}
-		$decrypted = $this->decrypt($session, $this->crypt);
-		$data = $decrypted ? json_decode($decrypted) : null;
-		return strval($data->session ?? '');
+		if($session && $this->sessionKp) {
+			$decrypted = $this->unseal($session, $this->sessionKp);
+			$data = $decrypted ? unserialize($decrypted) : null;
+			return strval($data['id'] ?? '');
+		}
+		return '';
 	}
 
 	/**
@@ -309,10 +426,11 @@ class Alianovna
 	 */
 	private function mkdir(): bool
 	{
-		$directory = is_dir($this->mainDir) || mkdir($this->mainDir, 0777, true);
-		$registry = is_dir($this->registryDir) || mkdir($this->registryDir, 0777, true);
-		$session = is_dir($this->sessionDir) || mkdir($this->sessionDir, 0777, true);
-		return $directory && $registry && $session;
+		$directory = is_dir($this->mainDir) || mkdir($this->mainDir, 0700, true);
+		$key = is_dir($this->keyDir) || mkdir($this->keyDir, 0700, true);
+		$registry = is_dir($this->registryDir) || mkdir($this->registryDir, 0700, true);
+		$session = is_dir($this->sessionDir) || mkdir($this->sessionDir, 0700, true);
+		return $directory && $key && $registry && $session;
 	}
 
 	/**
@@ -350,15 +468,28 @@ class Alianovna
 		$this->crypt = $crypt;
 
 		$this->mainDir = $directory;
-		$this->registryDir = $directory . DIRECTORY_SEPARATOR . self::REGISTRY;
-		$this->sessionDir = $directory . DIRECTORY_SEPARATOR . self::SESSION;
+		$this->keyDir = $directory . DIRECTORY_SEPARATOR . self::DIR_KEY;
+		$this->registryDir = $directory . DIRECTORY_SEPARATOR . self::DIR_REGISTRY;
+		$this->sessionDir = $directory . DIRECTORY_SEPARATOR . self::DIR_SESSION;
 
 		if($cookie) {
 			$this->cookie = $cookie;
 			$this->useCookies = true;
 		}
 
-		$this->expire = 365 * 24 * 60 * 60;
+		$this->expire = self::DEFAULT_EXPIRE;
+	}
+
+	/**
+	 * Session name
+	 *
+	 * @param string $name
+	 * @return $this
+	 */
+	public function name(string $name): Alianovna
+	{
+		$this->name = $name;
+		return $this;
 	}
 
 	/**
@@ -495,7 +626,7 @@ class Alianovna
 			return $created && $saved;
 		}
 		else {
-			if(!$this->session || !$this->secret) {
+			if(!$this->session || !$this->sessionKp || !$this->registryKp) {
 				return false;
 			}
 			$this->deleteRegistryFiles();
@@ -507,6 +638,7 @@ class Alianovna
 	 * Try to load an existing session
 	 *
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function read(): bool
 	{
@@ -516,7 +648,11 @@ class Alianovna
 			return false;
 		}
 
-		if(!$this->session || !$this->secret) {
+		if(!$this->initRegistryKeyPair()) {
+			return false;
+		}
+
+		if(!$this->session || !$this->sessionKp) {
 			$raw = '';
 			foreach ($this->keys as $registry) {
 				$path = $this->registryDir . DIRECTORY_SEPARATOR . $registry;
@@ -525,21 +661,21 @@ class Alianovna
 				}
 				$raw .= $chunk;
 			}
-			if($raw && $json = $this->decrypt($raw, $this->crypt)) {
-				$params = json_decode($json);
-				if($session = $params->session ?? null) {
-					$this->session = $session;
+			if($raw && $serialized = $this->unseal($raw, $this->registryKp)) {
+				$params = unserialize($serialized);
+				if($id = $params['id'] ?? null) {
+					$this->session = $id;
 				}
-				if($secret = $params->secret ?? null) {
-					$this->secret = $secret;
+				if($kp = $params['kp'] ?? null) {
+					$this->sessionKp = base64_decode($kp) ?: null;
 				}
 			}
 		}
 
 		$path = $this->sessionDir . DIRECTORY_SEPARATOR . $this->session;
-		if($this->session && $this->secret && is_file($path)) {
+		if($this->session && $this->sessionKp && is_file($path)) {
 			$raw = file_get_contents($path);
-			if($raw && $serialized = $this->decrypt($raw, $this->secret)) {
+			if($raw && $serialized = $this->unseal($raw, $this->sessionKp)) {
 				$this->data = unserialize($serialized);
 			}
 			elseif(null === $raw) {
@@ -566,14 +702,14 @@ class Alianovna
 	public function save(array $overwrite = null): bool
 	{
 		$path = $this->sessionDir . DIRECTORY_SEPARATOR . $this->session;
-		if(!$this->session || !$this->secret || !is_file($path)) {
+		if(!$this->session || !$this->sessionKp || !is_file($path)) {
 			return false;
 		}
 		if(null !== $overwrite) {
 			$this->data = $overwrite;
 		}
 		$serialized = serialize($this->data);
-		$encrypted = $this->encrypt($serialized, $this->secret);
+		$encrypted = $this->seal($serialized, $this->sessionKp);
 		return $this->write($path, $encrypted);
 	}
 
@@ -668,7 +804,7 @@ class Alianovna
 
 		$this->keys = [];
 		$this->session = null;
-		$this->secret = null;
+		$this->sessionKp = null;
 		$this->data = null;
 		return $this;
 	}
@@ -681,6 +817,7 @@ class Alianovna
 	public function kill(): bool
 	{
 		$this->destroy();
+		$this->registryKp = null;
 		$rmdir = $this->rmdir();
 		$mkdir = $this->mkdir();
 		return $rmdir && $mkdir;
