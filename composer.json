@@ -12,11 +12,7 @@
         }
     ],
     "require": {
-        "php": ">=7.0",
-        "ext-openssl": "*",
-        "coercive/crypt": "^1",
-        "coercive/cookie": "^1.1.3",
-        "paragonie/sodium_compat": "^1.14"
+        "php": ">=7.0"
     },
     "autoload": {
         "psr-4": { "Coercive\\Security\\Session\\": "dist/" }
