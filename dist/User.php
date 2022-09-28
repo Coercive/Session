@@ -12,23 +12,39 @@ class User
 		TIME_PATH = 'time',
 		TOKEN_PATH = 'token',
 		LOGIN_PATH = 'login',
-		ID_PATH = 'id';
+		ID_PATH = 'id',
+		LEVEL_PATH = 'level',
+		FROM_PATH = 'from',
+		ORIGIN_PATH = 'origin';
 
-	/** @var Session */
-	private $session = null;
+	private Session $session;
 
 	/** @var string Session user path */
-	private $path = '';
+	private string $path;
 
 	/**
 	 * User constructor.
 	 *
 	 * @param Session $session
+	 * @return void
 	 */
 	public function __construct(Session $session)
 	{
 		$this->session = $session;
 		$this->path = $session->Config()->getUserSessionPath();
+	}
+
+	/**
+	 * DELETE USER
+	 *
+	 * @return $this
+	 */
+	public function delete(): User
+	{
+		if($this->session->isActive()) {
+			unset($_SESSION[$this->path]);
+		}
+		return $this;
 	}
 
 	/**
@@ -38,27 +54,23 @@ class User
 	 */
 	public function isConnected(): bool
 	{
-		# No datas
-		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::CONNECTED_PATH])) { return false; }
-
-		# Retrieve
+		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::CONNECTED_PATH])) {
+			return false;
+		}
 		return (bool) $_SESSION[$this->path][self::CONNECTED_PATH];
 	}
 
 	/**
 	 * SET CONNECTED STATE
 	 *
-	 * @param bool $bState
+	 * @param bool $state
 	 * @return $this
 	 */
 	public function setConnectedState(bool $state): User
 	{
-		# Set
 		if($this->session->isActive()) {
-			$_SESSION[$this->path][self::CONNECTED_PATH] = (bool) $state;
+			$_SESSION[$this->path][self::CONNECTED_PATH] = $state;
 		}
-
-		# Maintain chainability
 		return $this;
 	}
 
@@ -69,11 +81,10 @@ class User
 	 */
 	public function getId(): int
 	{
-		# No datas
-		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::ID_PATH])) { return 0; }
-
-		# Retrieve
-		return (int) filter_var($_SESSION[$this->path][self::ID_PATH], FILTER_VALIDATE_INT);
+		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::ID_PATH])) {
+			return 0;
+		}
+		return (int) $_SESSION[$this->path][self::ID_PATH];
 	}
 
 	/**
@@ -84,12 +95,9 @@ class User
 	 */
 	public function setId(int $id): User
 	{
-		# Set
 		if($this->session->isActive()) {
-			$_SESSION[$this->path][self::ID_PATH] = filter_var($id, FILTER_VALIDATE_INT) ?: 0;
+			$_SESSION[$this->path][self::ID_PATH] = $id;
 		}
-
-		# Maintain chainability
 		return $this;
 	}
 
@@ -100,27 +108,23 @@ class User
 	 */
 	public function getLogin(): string
 	{
-		# No datas
-		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::LOGIN_PATH])) { return ''; }
-
-		# Retrieve
-		return (string) strtolower(filter_var($_SESSION[$this->path][self::LOGIN_PATH], FILTER_VALIDATE_EMAIL));
+		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::LOGIN_PATH])) {
+			return '';
+		}
+		return (string) filter_var($_SESSION[$this->path][self::LOGIN_PATH], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 	}
 
 	/**
 	 * SET USER LOGIN
 	 *
-	 * @param string $email
+	 * @param string $login
 	 * @return $this
 	 */
-	public function setLogin(string $email): User
+	public function setLogin(string $login): User
 	{
-		# Set
 		if($this->session->isActive()) {
-			$_SESSION[$this->path][self::LOGIN_PATH] = strtolower(filter_var($email, FILTER_VALIDATE_EMAIL) ?: '');
+			$_SESSION[$this->path][self::LOGIN_PATH] = (string) filter_var($login, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 		}
-
-		# Maintain chainability
 		return $this;
 	}
 
@@ -131,10 +135,9 @@ class User
 	 */
 	public function getToken(): string
 	{
-		# No datas
-		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::TOKEN_PATH])) { return ''; }
-
-		# Retrieve
+		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::TOKEN_PATH])) {
+			return '';
+		}
 		return (string) filter_var($_SESSION[$this->path][self::TOKEN_PATH], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 	}
 
@@ -146,12 +149,9 @@ class User
 	 */
 	public function setToken(string $token): User
 	{
-		# Set
 		if($this->session->isActive()) {
-			$_SESSION[$this->path][self::TOKEN_PATH] = filter_var($token, FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?: '';
+			$_SESSION[$this->path][self::TOKEN_PATH] = (string) filter_var($token, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 		}
-
-		# Maintain chainability
 		return $this;
 	}
 
@@ -162,11 +162,10 @@ class User
 	 */
 	public function getTime(): int
 	{
-		# No datas
-		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::TIME_PATH])) { return 0; }
-
-		# Retrieve
-		return (int) filter_var($_SESSION[$this->path][self::TIME_PATH], FILTER_VALIDATE_INT);
+		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::TIME_PATH])) {
+			return 0;
+		}
+		return (int) $_SESSION[$this->path][self::TIME_PATH];
 	}
 
 	/**
@@ -177,12 +176,9 @@ class User
 	 */
 	public function setTime(int $time): User
 	{
-		# Set
 		if($this->session->isActive()) {
-			$_SESSION[$this->path][self::TIME_PATH] = filter_var($time, FILTER_VALIDATE_INT) ?: 0;
+			$_SESSION[$this->path][self::TIME_PATH] = $time;
 		}
-
-		# Maintain chainability
 		return $this;
 	}
 
@@ -193,10 +189,9 @@ class User
 	 */
 	public function getLanguage(): string
 	{
-		# No datas
-		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::LANGUAGE_PATH])) { return ''; }
-
-		# Retrieve
+		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::LANGUAGE_PATH])) {
+			return '';
+		}
 		return (string) filter_var($_SESSION[$this->path][self::LANGUAGE_PATH], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 	}
 
@@ -208,28 +203,90 @@ class User
 	 */
 	public function setLanguage(string $lang): User
 	{
-		# Set
 		if($this->session->isActive()) {
-			$_SESSION[$this->path][self::LANGUAGE_PATH] = filter_var($lang, FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?: '';
+			$_SESSION[$this->path][self::LANGUAGE_PATH] = (string) filter_var($lang, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 		}
-
-		# Maintain chainability
 		return $this;
 	}
 
 	/**
-	 * DELETE USER
+	 * GET USER LEVEL
 	 *
+	 * @return string
+	 */
+	public function getLevel(): string
+	{
+		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::LEVEL_PATH])) {
+			return '';
+		}
+		return (string) filter_var($_SESSION[$this->path][self::LEVEL_PATH], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+	}
+
+	/**
+	 * SET USER LEVEL
+	 *
+	 * @param string $lvl
 	 * @return $this
 	 */
-	public function delete(): User
+	public function setLevel(string $lvl): User
 	{
-		# Delete
 		if($this->session->isActive()) {
-			unset($_SESSION[$this->path]);
+			$_SESSION[$this->path][self::LEVEL_PATH] = (string) filter_var($lvl, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 		}
+		return $this;
+	}
 
-		# Maintain chainability
+	/**
+	 * GET USER FROM
+	 *
+	 * @return string
+	 */
+	public function getFrom(): string
+	{
+		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::FROM_PATH])) {
+			return '';
+		}
+		return (string) filter_var($_SESSION[$this->path][self::FROM_PATH], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+	}
+
+	/**
+	 * SET USER FROM
+	 *
+	 * @param string $from
+	 * @return $this
+	 */
+	public function setFrom(string $from): User
+	{
+		if($this->session->isActive()) {
+			$_SESSION[$this->path][self::FROM_PATH] = (string) filter_var($from, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+		}
+		return $this;
+	}
+
+	/**
+	 * GET USER ORIGIN
+	 *
+	 * @return string
+	 */
+	public function getOrigin(): string
+	{
+		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::ORIGIN_PATH])) {
+			return '';
+		}
+		return (string) filter_var($_SESSION[$this->path][self::ORIGIN_PATH], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+	}
+
+	/**
+	 * SET USER ORIGIN
+	 *
+	 * @param string $origin
+	 * @return $this
+	 */
+	public function setOrigin(string $origin): User
+	{
+		if($this->session->isActive()) {
+			$_SESSION[$this->path][self::ORIGIN_PATH] = (string) filter_var($origin, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+		}
 		return $this;
 	}
 }

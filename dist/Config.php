@@ -11,30 +11,30 @@ class Config
 	# Ini set
 
 	/** @var array List of session ini set */
-	private $ini = [];
+	private array $ini = [];
 
 	/** @var DateTime Init session date */
-	private $date = null;
+	private DateTime $date;
 
 	# Options
 
 	/** @var bool If the session will autostart or not */
-	private $activate = true;
+	private bool $activate = true;
 
 	/** @var bool Connection State */
-	private $connectionState = false;
+	private bool $connectionState = false;
 
 	/** @var string Connection DB Table */
-	private $connectionTable = 'CONNECTION';
+	private string $connectionTable = 'CONNECTION';
 
 	/** @var string IP Connection DB Table */
-	private $ipConnectionTable = 'IP_CONNECTION';
+	private string $ipConnectionTable = 'IP_CONNECTION';
 
 	/** @var string User Session Path */
-	private $userSessionPath = 'user';
+	private string $userSessionPath = 'user';
 
 	/** @var string Redirect Session Path */
-	private $redirectSessionPath = 'redirect';
+	private string $redirectSessionPath = 'redirect';
 
 	/**
 	 * Config constructor.

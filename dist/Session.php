@@ -16,17 +16,11 @@ use Exception;
  */
 class Session
 {
-	/** @var Config */
-	private $config = null;
+	private Config $config;
 
-	/** @var DateTime */
-	private $date = null;
+	private Redirect $redirect;
 
-	/** @var Redirect */
-	private $redirect = null;
-
-	/** @var User */
-	private $user = null;
+	private User $user;
 
 	/**
 	 * Vérifie la validité de l'ID de session
@@ -53,9 +47,6 @@ class Session
 		if($conf->isAutoStartSession()) {
 			$this->startSession();
 		}
-
-		# TimeStamp
-		$this->date = $conf->getDate();
 
 		# Redirect
 		$this->redirect = new Redirect($this);
@@ -147,7 +138,7 @@ class Session
 	 */
 	public function setSessionDate(DateTime $date): Session
 	{
-		$this->date = $date;
+		$this->Config()->setDate($date);
 		return $this;
 	}
 
@@ -168,7 +159,9 @@ class Session
 	 */
 	public function regenerateId(): Session
 	{
-		if($this->isActive()) { session_regenerate_id(); }
+		if($this->isActive()) {
+			session_regenerate_id();
+		}
 		return $this;
 	}
 }
