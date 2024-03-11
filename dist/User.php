@@ -89,6 +89,17 @@ class User
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function isCollectiveSubscriptionInitialized(): bool
+	{
+		if(!$this->session->isActive()) {
+			return false;
+		}
+		return isset($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_PATH]);
+	}
+
+	/**
 	 * @param bool $state
 	 * @return $this
 	 */
