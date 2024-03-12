@@ -17,6 +17,9 @@ class User
 		FROM_PATH = 'from',
 		ORIGIN_PATH = 'origin',
 		COLLECTIVE_SUBSCRIPTION_PATH = 'collective_subscription',
+		COLLECTIVE_SUBSCRIPTION_BY_IP_INITIALIZED_PATH = 'collective_subscription_by_ip_initialized',
+		COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_INITIALIZED_PATH = 'collective_subscription_by_domain_initialized',
+		COLLECTIVE_SUBSCRIPTION_BY_EMAIL_INITIALIZED_PATH = 'collective_subscription_by_email_initialized',
 		COLLECTIVE_SUBSCRIPTION_BY_IP_PATH = 'collective_subscription_by_ip',
 		COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_PATH = 'collective_subscription_by_domain',
 		COLLECTIVE_SUBSCRIPTION_BY_EMAIL_PATH = 'collective_subscription_by_email';
@@ -89,17 +92,6 @@ class User
 	}
 
 	/**
-	 * @return bool
-	 */
-	public function isCollectiveSubscriptionInitialized(): bool
-	{
-		if(!$this->session->isActive()) {
-			return false;
-		}
-		return isset($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_PATH]);
-	}
-
-	/**
 	 * @param bool $state
 	 * @return $this
 	 */
@@ -112,6 +104,75 @@ class User
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function isCollectiveSubscriptionByIpInitialized(): bool
+	{
+		if(!$this->session->isActive()) {
+			return false;
+		}
+		return !empty($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_IP_INITIALIZED_PATH]);
+	}
+
+	/**
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setCollectiveSubscriptionByIpInitialized(bool $state): self
+	{
+		if($this->session->isActive()) {
+			$_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_IP_INITIALIZED_PATH] = $state;
+		}
+		return $this;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isCollectiveSubscriptionByDomainInitialized(): bool
+	{
+		if(!$this->session->isActive()) {
+			return false;
+		}
+		return !empty($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_INITIALIZED_PATH]);
+	}
+
+	/**
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setCollectiveSubscriptionByDomainInitialized(bool $state): self
+	{
+		if($this->session->isActive()) {
+			$_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_INITIALIZED_PATH] = $state;
+		}
+		return $this;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isCollectiveSubscriptionByEmailInitialized(): bool
+	{
+		if(!$this->session->isActive()) {
+			return false;
+		}
+		return !empty($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_EMAIL_INITIALIZED_PATH]);
+	}
+
+	/**
+	 * @param bool $state
+	 * @return $this
+	 */
+	public function setCollectiveSubscriptionByEmailInitialized(bool $state): self
+	{
+		if($this->session->isActive()) {
+			$_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_EMAIL_INITIALIZED_PATH] = $state;
+		}
+		return $this;
+	}
+
+	/**
 	 * The IP from collective subscription
 	 *
 	 * @return string
@@ -119,7 +180,7 @@ class User
 	public function getCollectiveSubscriptionIp(): string
 	{
 		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_IP_PATH])) {
-			return false;
+			return '';
 		}
 		return (string) filter_var($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_IP_PATH], FILTER_VALIDATE_IP);
 	}
@@ -144,7 +205,7 @@ class User
 	public function getCollectiveSubscriptionDomain(): string
 	{
 		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_PATH])) {
-			return false;
+			return '';
 		}
 		return (string) filter_var($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_PATH], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 	}
@@ -169,7 +230,7 @@ class User
 	public function getCollectiveSubscriptionEmail(): string
 	{
 		if(!$this->session->isActive() || empty($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_EMAIL_PATH])) {
-			return false;
+			return '';
 		}
 		return (string) filter_var($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_EMAIL_PATH], FILTER_VALIDATE_EMAIL);
 	}
