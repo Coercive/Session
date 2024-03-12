@@ -20,6 +20,9 @@ class User
 		COLLECTIVE_SUBSCRIPTION_BY_IP_INITIALIZED_PATH = 'collective_subscription_by_ip_initialized',
 		COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_INITIALIZED_PATH = 'collective_subscription_by_domain_initialized',
 		COLLECTIVE_SUBSCRIPTION_BY_EMAIL_INITIALIZED_PATH = 'collective_subscription_by_email_initialized',
+		COLLECTIVE_SUBSCRIPTION_BY_IP_INITIALIZED_TIME_PATH = 'collective_subscription_by_ip_initialized_time',
+		COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_INITIALIZED_TIME_PATH = 'collective_subscription_by_domain_initialized_time',
+		COLLECTIVE_SUBSCRIPTION_BY_EMAIL_INITIALIZED_TIME_PATH = 'collective_subscription_by_email_initialized_time',
 		COLLECTIVE_SUBSCRIPTION_BY_IP_PATH = 'collective_subscription_by_ip',
 		COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_PATH = 'collective_subscription_by_domain',
 		COLLECTIVE_SUBSCRIPTION_BY_EMAIL_PATH = 'collective_subscription_by_email';
@@ -41,6 +44,9 @@ class User
 		self::COLLECTIVE_SUBSCRIPTION_BY_IP_INITIALIZED_PATH,
 		self::COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_INITIALIZED_PATH,
 		self::COLLECTIVE_SUBSCRIPTION_BY_EMAIL_INITIALIZED_PATH,
+		self::COLLECTIVE_SUBSCRIPTION_BY_IP_INITIALIZED_TIME_PATH,
+		self::COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_INITIALIZED_TIME_PATH,
+		self::COLLECTIVE_SUBSCRIPTION_BY_EMAIL_INITIALIZED_TIME_PATH,
 		self::COLLECTIVE_SUBSCRIPTION_BY_IP_PATH,
 		self::COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_PATH,
 		self::COLLECTIVE_SUBSCRIPTION_BY_EMAIL_PATH,
@@ -134,14 +140,17 @@ class User
 	}
 
 	/**
+	 * @param int $delay [optional]
 	 * @return bool
 	 */
-	public function isCollectiveSubscriptionByIpInitialized(): bool
+	public function isCollectiveSubscriptionByIpInitialized(int $delay = 0): bool
 	{
 		if(!$this->session->isActive()) {
 			return false;
 		}
-		return !empty($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_IP_INITIALIZED_PATH]);
+		$state = !empty($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_IP_INITIALIZED_PATH]);
+		$upToDate = !$delay || intval($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_IP_INITIALIZED_TIME_PATH] ?? 0) + $delay > time();
+		return $state && $upToDate;
 	}
 
 	/**
@@ -152,19 +161,23 @@ class User
 	{
 		if($this->session->isActive()) {
 			$_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_IP_INITIALIZED_PATH] = $state;
+			$_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_IP_INITIALIZED_TIME_PATH] = $state ? time() : 0;
 		}
 		return $this;
 	}
 
 	/**
+	 * @param int $delay [optional]
 	 * @return bool
 	 */
-	public function isCollectiveSubscriptionByDomainInitialized(): bool
+	public function isCollectiveSubscriptionByDomainInitialized(int $delay = 0): bool
 	{
 		if(!$this->session->isActive()) {
 			return false;
 		}
-		return !empty($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_INITIALIZED_PATH]);
+		$state = !empty($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_INITIALIZED_PATH]);
+		$upToDate = !$delay || intval($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_INITIALIZED_TIME_PATH] ?? 0) + $delay > time();
+		return $state && $upToDate;
 	}
 
 	/**
@@ -175,19 +188,23 @@ class User
 	{
 		if($this->session->isActive()) {
 			$_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_INITIALIZED_PATH] = $state;
+			$_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_INITIALIZED_TIME_PATH] = $state ? time() : 0;
 		}
 		return $this;
 	}
 
 	/**
+	 * @param int $delay [optional]
 	 * @return bool
 	 */
-	public function isCollectiveSubscriptionByEmailInitialized(): bool
+	public function isCollectiveSubscriptionByEmailInitialized(int $delay = 0): bool
 	{
 		if(!$this->session->isActive()) {
 			return false;
 		}
-		return !empty($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_EMAIL_INITIALIZED_PATH]);
+		$state = !empty($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_EMAIL_INITIALIZED_PATH]);
+		$upToDate = !$delay || intval($_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_EMAIL_INITIALIZED_TIME_PATH] ?? 0) + $delay > time();
+		return $state && $upToDate;
 	}
 
 	/**
@@ -198,6 +215,7 @@ class User
 	{
 		if($this->session->isActive()) {
 			$_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_EMAIL_INITIALIZED_PATH] = $state;
+			$_SESSION[$this->path][self::COLLECTIVE_SUBSCRIPTION_BY_EMAIL_INITIALIZED_TIME_PATH] = $state ? time() : 0;
 		}
 		return $this;
 	}
