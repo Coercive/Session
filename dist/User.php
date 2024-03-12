@@ -24,6 +24,28 @@ class User
 		COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_PATH = 'collective_subscription_by_domain',
 		COLLECTIVE_SUBSCRIPTION_BY_EMAIL_PATH = 'collective_subscription_by_email';
 
+	const INDIVIDUAL = [
+		self::CONNECTED_PATH,
+		self::LANGUAGE_PATH,
+		self::TIME_PATH,
+		self::TOKEN_PATH,
+		self::LOGIN_PATH,
+		self::ID_PATH,
+		self::LEVEL_PATH,
+		self::FROM_PATH,
+		self::ORIGIN_PATH,
+	];
+
+	const COLLECTIVE = [
+		self::COLLECTIVE_SUBSCRIPTION_PATH,
+		self::COLLECTIVE_SUBSCRIPTION_BY_IP_INITIALIZED_PATH,
+		self::COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_INITIALIZED_PATH,
+		self::COLLECTIVE_SUBSCRIPTION_BY_EMAIL_INITIALIZED_PATH,
+		self::COLLECTIVE_SUBSCRIPTION_BY_IP_PATH,
+		self::COLLECTIVE_SUBSCRIPTION_BY_DOMAIN_PATH,
+		self::COLLECTIVE_SUBSCRIPTION_BY_EMAIL_PATH,
+	];
+
 	private Session $session;
 
 	/** @var string Session user path */
@@ -46,10 +68,18 @@ class User
 	 *
 	 * @return $this
 	 */
-	public function delete(): self
+	public function delete(bool $individual = true, bool $collective = true): self
 	{
 		if($this->session->isActive()) {
-			unset($_SESSION[$this->path]);
+			if($individual && $collective) {
+				unset($_SESSION[$this->path]);
+			}
+			else {
+				$fields = $individual ? self::INDIVIDUAL : self::COLLECTIVE;
+				foreach ($fields as $field) {
+					unset($_SESSION[$this->path][$field]);
+				}
+			}
 		}
 		return $this;
 	}
